@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Dona Tônia</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde:       #2d6a4f;
+    --verde-claro: #52b788;
+    --laranja:     #f4a261;
+    --vermelho:    #e63946;
+    --azul:        #457b9d;
+    --fundo:       #f1f3f0;
+    --branco:      #ffffff;
+    --texto:       #1a1a2e;
+    --cinza:       #888;
+    --sombra:      0 4px 20px rgba(0,0,0,0.09);
+    --radius:      14px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'DM Sans',sans-serif; background:var(--fundo); color:var(--texto); }
+
+  /* LOGIN */
+  #tela-login {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, var(--verde) 0%, var(--verde-claro) 100%);
+  }
+  .login-box {
+    background: white;
+    border-radius: 24px;
+    padding: 40px 32px;
+    width: 320px;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.18);
+  }
+  .login-box h1 { font-family:'Syne',sans-serif; font-size:1.6rem; margin-bottom:6px; }
+  .login-box p  { color:var(--cinza); font-size:0.9rem; margin-bottom:24px; }
+  .login-box input {
+    width:100%; padding:12px 14px;
+    border:1.5px solid #ddd; border-radius:10px;
+    font-size:1rem; font-family:inherit;
+    margin-bottom:14px; outline:none;
+  }
+  .login-box input:focus { border-color:var(--verde); }
+  .btn-entrar {
+    width:100%; background:var(--verde); color:white;
+    border:none; border-radius:12px; padding:13px;
+    font-size:1rem; font-weight:700; cursor:pointer;
+    transition: background 0.2s;
+  }
+  .btn-entrar:hover { background:var(--verde-claro); }
+  .erro-login { color:var(--vermelho); font-size:0.85rem; margin-top:10px; display:none; }
+
+  /* ADMIN LAYOUT */
+  #tela-admin { display:none; }
+  .admin-header {
+    background:var(--verde); color:white;
+    padding:16px 24px; display:flex;
+    align-items:center; justify-content:space-between;
+    box-shadow:0 2px 10px rgba(0,0,0,0.15);
+  }
+  .admin-header h1 { font-family:'Syne',sans-serif; font-size:1.3rem; }
+  .btn-sair {
+    background:rgba(255,255,255,0.2); border:none;
+    border-radius:8px; color:white; padding:8px 14px;
+    font-weight:600; cursor:pointer; font-size:0.85rem;
+  }
+
+  /* ABAS */
+  .abas {
+    display:flex; background:white;
+    border-bottom:2px solid #e0e0e0;
+    overflow-x:auto; gap:0;
+  }
+  .aba {
+    padding:14px 20px; font-weight:600;
+    cursor:pointer; border-bottom:3px solid transparent;
+    white-space:nowrap; font-size:0.9rem;
+    transition:all 0.2s; color:var(--cinza);
+  }
+  .aba.ativa { border-bottom-color:var(--verde); color:var(--verde); }
+
+  .conteudo { padding:24px; max-width:900px; margin:0 auto; }
+
+  /* CARDS STAT */
+  .stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-bottom:24px; }
+  .stat-card {
+    background:white; border-radius:var(--radius);
+    padding:16px; box-shadow:var(--sombra);
+    text-align:center;
+  }
+  .stat-card .num { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; }
+  .stat-card .leg { font-size:0.8rem; color:var(--cinza); margin-top:4px; }
+
+  /* FORMULARIO PRODUTO */
+  .card-form {
+    background:white; border-radius:var(--radius);
+    padding:22px; box-shadow:var(--sombra); margin-bottom:20px;
+  }
+  .card-form h2 { font-family:'Syne',sans-serif; font-size:1.1rem; margin-bottom:16px; }
+  .form-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .form-grid.full { grid-template-columns:1fr; }
+  .campo-admin { display:flex; flex-direction:column; gap:4px; }
+  .campo-admin label { font-size:0.8rem; font-weight:600; color:var(--cinza); }
+  .campo-admin input, .campo-admin select {
+    border:1.5px solid #ddd; border-radius:10px;
+    padding:9px 12px; font-size:0.9rem;
+    font-family:inherit; outline:none;
+  }
+  .campo-admin input:focus, .campo-admin select:focus { border-color:var(--verde); }
+
+  /* Toggle desconto */
+  .toggle-wrap { display:flex; align-items:center; gap:10px; margin:10px 0; }
+  .toggle {
+    width:46px; height:26px; border-radius:50px;
+    background:#ccc; cursor:pointer; position:relative;
+    transition:background 0.2s; border:none; outline:none;
+  }
+  .toggle::after {
+    content:''; position:absolute; top:3px; left:3px;
+    width:20px; height:20px; border-radius:50%;
+    background:white; transition:transform 0.2s;
+  }
+  .toggle.on { background:var(--verde); }
+  .toggle.on::after { transform:translateX(20px); }
+  .toggle-label { font-size:0.88rem; font-weight:600; }
+
+  /* Botões ação */
+  .btn-acao {
+    padding:10px 18px; border-radius:10px; border:none;
+    font-weight:700; font-size:0.88rem; cursor:pointer;
+    transition:all 0.15s;
+  }
+  .btn-verde  { background:var(--verde); color:white; }
+  .btn-verde:hover { background:var(--verde-claro); }
+  .btn-laranja { background:var(--laranja); color:white; }
+  .btn-laranja:hover { opacity:0.85; }
+  .btn-vermelho { background:var(--vermelho); color:white; }
+  .btn-vermelho:hover { opacity:0.85; }
+  .btn-azul { background:var(--azul); color:white; }
+
+  /* LISTA PRODUTOS ADMIN */
+  .produto-linha {
+    display:flex; align-items:center; gap:12px;
+    background:white; border-radius:var(--radius);
+    padding:12px 16px; margin-bottom:10px;
+    box-shadow:var(--sombra);
+  }
+  .produto-linha img {
+    width:54px; height:54px; border-radius:10px; object-fit:cover;
+  }
+  .prod-info { flex:1; }
+  .prod-info strong { display:block; font-size:0.95rem; }
+  .prod-info span { font-size:0.8rem; color:var(--cinza); }
+  .prod-acoes { display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end; }
+
+  /* Badge desconto ativo */
+  .badge-on  { background:var(--verde); color:white; border-radius:50px; font-size:0.72rem; padding:2px 8px; font-weight:700; }
+  .badge-off { background:#eee; color:var(--cinza); border-radius:50px; font-size:0.72rem; padding:2px 8px; font-weight:700; }
+
+  /* GRAFICO VENDAS */
+  .bar-chart { display:flex; align-items:flex-end; gap:10px; height:180px; padding:0 0 4px; }
+  .bar-item  { flex:1; display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .bar {
+    width:100%; border-radius:8px 8px 0 0;
+    background:var(--verde); transition:height 0.5s ease;
+    min-height:4px;
+  }
+  .bar-nome { font-size:0.68rem; text-align:center; color:var(--cinza); }
+  .bar-val  { font-size:0.72rem; font-weight:700; }
+
+  /* ESTOQUE */
+  .estoque-linha {
+    background:white; border-radius:var(--radius);
+    padding:14px 18px; margin-bottom:10px;
+    box-shadow:var(--sombra); display:flex;
+    align-items:center; gap:14px; flex-wrap:wrap;
+  }
+  .est-nome { flex:1; font-weight:700; font-size:0.95rem; }
+  .est-campo { display:flex; align-items:center; gap:6px; }
+  .est-campo label { font-size:0.78rem; color:var(--cinza); }
+  .est-campo input, .est-campo select {
+    border:1.5px solid #ddd; border-radius:8px;
+    padding:6px 10px; font-size:0.88rem; width:90px;
+    font-family:inherit; outline:none;
+  }
+  .est-campo input:focus, .est-campo select:focus { border-color:var(--verde); }
+
+  /* Seções */
+  .secao { display:none; }
+  .secao.ativa { display:block; }
+
+  /* Link para loja */
+  .link-loja {
+    display:inline-block;
+    background:var(--verde-claro); color:white;
+    border-radius:10px; padding:8px 16px;
+    text-decoration:none; font-weight:700; font-size:0.88rem;
+    margin-bottom:20px;
+  }
+
+  @media (max-width:480px) {
+    .form-grid { grid-template-columns:1fr; }
+    .conteudo { padding:14px; }
+    .produto-linha { flex-wrap:wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================== LOGIN ======================== -->
+<div id="tela-login">
+  <div class="login-box">
+    <h1>🔐 Admin</h1>
+    <p>Painel da Frutaria Dona Tônia</p>
+    <input type="password" id="senha-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')entrar()">
+    <button class="btn-entrar" onclick="entrar()">Entrar</button>
+    <div class="erro-login" id="erro-login">Senha incorreta!</div>
+  </div>
+</div>
+
+<!-- ======================== ADMIN ======================== -->
+<div id="tela-admin">
+
+  <div class="admin-header">
+    <h1>🍃 Admin — Dona Tônia</h1>
+    <button class="btn-sair" onclick="sair()">Sair</button>
+  </div>
+
+  <!-- ABAS -->
+  <div class="abas">
+    <div class="aba ativa" onclick="mudarAba('produtos', this)">📦 Produtos</div>
+    <div class="aba" onclick="mudarAba('estoque', this)">📊 Estoque</div>
+    <div class="aba" onclick="mudarAba('vendas', this)">🏆 Mais Vendidos</div>
+  </div>
+
+  <div class="conteudo">
+    <a class="link-loja" href="index.html" target="_blank">🛒 Ver loja do cliente ↗</a>
+
+    <!-- ======== ABA PRODUTOS ======== -->
+    <div class="secao ativa" id="sec-produtos">
+
+      <!-- Formulário novo produto -->
+      <div class="card-form">
+        <h2 id="form-titulo">➕ Adicionar Produto</h2>
+        <input type="hidden" id="edit-id" value="">
+        <div class="form-grid">
+          <div class="campo-admin">
+            <label>Nome do produto *</label>
+            <input type="text" id="p-nome" placeholder="Ex: Laranja Pera">
+          </div>
+          <div class="campo-admin">
+            <label>Categoria *</label>
+            <select id="p-cat"><!-- preenchida pelo JS --></select>
+          </div>
+          <div class="campo-admin">
+            <label>Preço (R$) *</label>
+            <input type="number" id="p-preco" placeholder="0.00" step="0.01" min="0">
+          </div>
+          <div class="campo-admin">
+            <label>Unidade de venda</label>
+            <select id="p-unidade">
+              <option value="kg">kg</option>
+              <option value="unidade">unidade</option>
+              <option value="caixa">caixa</option>
+              <option value="grama">grama</option>
+              <option value="maço">maço</option>
+              <option value="dúzia">dúzia</option>
+            </select>
+          </div>
+          <div class="campo-admin" style="grid-column:span 2">
+            <label>URL da foto *</label>
+            <input type="text" id="p-foto" placeholder="https://... cole link de imagem">
+          </div>
+        </div>
+
+        <!-- Desconto -->
+        <div style="margin-top:14px; padding:14px; background:#f8f8f8; border-radius:12px;">
+          <div class="toggle-wrap">
+            <button class="toggle" id="toggle-desc" onclick="toggleDesconto()"></button>
+            <span class="toggle-label" id="toggle-label">Desconto: <strong>Desativado</strong></span>
+          </div>
+          <div id="campo-perc" style="display:none; margin-top:8px;">
+            <div class="campo-admin">
+              <label>Percentual de desconto (%)</label>
+              <input type="number" id="p-desconto" placeholder="Ex: 15" min="1" max="99">
+            </div>
+            <p style="font-size:0.78rem; color:var(--cinza); margin-top:6px;">
+              ⚠️ O desconto só aparece para o cliente quando estiver <strong>Ativado</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+          <button class="btn-acao btn-verde" onclick="salvarProduto()">💾 Salvar Produto</button>
+          <button class="btn-acao btn-laranja" onclick="cancelarEdicao()" id="btn-cancelar" style="display:none">✕ Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Lista de produtos -->
+      <div id="lista-admin-produtos"></div>
+    </div>
+
+    <!-- ======== ABA ESTOQUE ======== -->
+    <div class="secao" id="sec-estoque">
+      <div class="card-form" style="margin-bottom:20px">
+        <h2>📦 Controle de Estoque</h2>
+        <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
+          Defina a quantidade e como o produto é medido no estoque.
+        </p>
+      </div>
+      <div id="lista-estoque"></div>
+      <button class="btn-acao btn-verde" onclick="salvarEstoque()" style="margin-top:10px">💾 Salvar Estoque</button>
+    </div>
+
+    <!-- ======== ABA MAIS VENDIDOS ======== -->
+    <div class="secao" id="sec-vendas">
+      <div class="card-form" style="margin-bottom:20px">
+        <h2>🏆 Produtos Mais Vendidos (semana)</h2>
+        <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
+          Baseado nas vendas registradas em <code>dados.js</code>.
+        </p>
+      </div>
+      <div class="card-form">
+        <div class="bar-chart" id="grafico-vendas"></div>
+      </div>
+      <div id="ranking-lista" style="margin-top:16px;"></div>
+    </div>
+
+  </div><!-- /conteudo -->
+</div><!-- /admin -->
+
+<script src="dados.js"></script>
+<script>
+// ============================================================
+// ADMIN SCRIPT
+// ============================================================
+let descontoAtivo = false;
+
+// ---- LOGIN ----
+function entrar() {
+  const s = document.getElementById('senha-input').value;
+  if (s === ADMIN_SENHA) {
+    document.getElementById('tela-login').style.display = 'none';
+    document.getElementById('tela-admin').style.display  = 'block';
+    iniciarAdmin();
+  } else {
+    document.getElementById('erro-login').style.display = 'block';
+  }
+}
+function sair() {
+  document.getElementById('tela-admin').style.display  = 'none';
+  document.getElementById('tela-login').style.display  = 'flex';
+  document.getElementById('senha-input').value = '';
+}
+
+// ---- ABAS ----
+function mudarAba(id, el) {
+  document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
+  document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+  document.getElementById('sec-' + id).classList.add('ativa');
+  el.classList.add('ativa');
+  if (id === 'vendas') renderGrafico();
+  if (id === 'estoque') renderEstoque();
+}
+
+// ---- INIT ----
+function iniciarAdmin() {
+  // Preencher categorias no select
+  const sel = document.getElementById('p-cat');
+  sel.innerHTML = '';
+  CATEGORIAS.forEach(c => {
+    const op = document.createElement('option');
+    op.value = c.id; op.textContent = c.nome;
+    sel.appendChild(op);
+  });
+  renderListaProdutos();
+}
+
+// ---- TOGGLE DESCONTO ----
+function toggleDesconto() {
+  descontoAtivo = !descontoAtivo;
+  const btn = document.getElementById('toggle-desc');
+  const lbl = document.getElementById('toggle-label');
+  const campo = document.getElementById('campo-perc');
+  btn.classList.toggle('on', descontoAtivo);
+  lbl.innerHTML = 'Desconto: <strong>' + (descontoAtivo ? 'Ativado ✅' : 'Desativado') + '</strong>';
+  campo.style.display = descontoAtivo ? 'block' : 'none';
+}
+
+// ---- SALVAR PRODUTO ----
+function salvarProduto() {
+  const nome   = document.getElementById('p-nome').value.trim();
+  const cat    = document.getElementById('p-cat').value;
+  const preco  = parseFloat(document.getElementById('p-preco').value);
+  const unid   = document.getElementById('p-unidade').value;
+  const foto   = document.getElementById('p-foto').value.trim();
+  const perc   = parseInt(document.getElementById('p-desconto').value) || 0;
+  const editId = document.getElementById('edit-id').value;
+
+  if (!nome || !cat || isNaN(preco) || !foto) {
+    alert('Preencha: nome, categoria, preço e foto!'); return;
+  }
+
+  if (editId) {
+    // Editar existente
+    const idx = PRODUTOS.findIndex(p => p.id == editId);
+    if (idx !== -1) {
+      PRODUTOS[idx] = { ...PRODUTOS[idx], nome, categoria:cat, preco, unidade:unid, foto,
+        desconto: descontoAtivo ? perc : 0, descontoAtivo };
+    }
+    cancelarEdicao();
+  } else {
+    // Novo produto
+    const novoId = Math.max(0, ...PRODUTOS.map(p => p.id)) + 1;
+    PRODUTOS.push({
+      id: novoId, nome, categoria: cat, preco, unidade: unid, foto,
+      desconto: descontoAtivo ? perc : 0, descontoAtivo,
+      estoque: 0, estoqueUnidade: 'unidade', vendas: 0
+    });
+    limparForm();
+  }
+  renderListaProdutos();
+  mostrarAviso('Produto salvo! Atualize dados.js para persistir.');
+}
+
+function limparForm() {
+  ['p-nome','p-preco','p-foto','p-desconto'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('p-cat').selectedIndex = 0;
+  document.getElementById('p-unidade').selectedIndex = 0;
+  descontoAtivo = false;
+  document.getElementById('toggle-desc').classList.remove('on');
+  document.getElementById('toggle-label').innerHTML = 'Desconto: <strong>Desativado</strong>';
+  document.getElementById('campo-perc').style.display = 'none';
+  document.getElementById('edit-id').value = '';
+  document.getElementById('form-titulo').textContent = '➕ Adicionar Produto';
+  document.getElementById('btn-cancelar').style.display = 'none';
+}
+function cancelarEdicao() { limparForm(); }
+
+// ---- EDITAR PRODUTO ----
+function editarProduto(id) {
+  const p = PRODUTOS.find(x => x.id == id);
+  if (!p) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('p-nome').value  = p.nome;
+  document.getElementById('p-cat').value   = p.categoria;
+  document.getElementById('p-preco').value = p.preco;
+  document.getElementById('p-unidade').value = p.unidade;
+  document.getElementById('p-foto').value  = p.foto;
+  document.getElementById('p-desconto').value = p.desconto || 0;
+  descontoAtivo = p.descontoAtivo;
+  document.getElementById('toggle-desc').classList.toggle('on', descontoAtivo);
+  document.getElementById('toggle-label').innerHTML = 'Desconto: <strong>' + (descontoAtivo ? 'Ativado ✅' : 'Desativado') + '</strong>';
+  document.getElementById('campo-perc').style.display = descontoAtivo ? 'block' : 'none';
+  document.getElementById('form-titulo').textContent = '✏️ Editando: ' + p.nome;
+  document.getElementById('btn-cancelar').style.display = 'inline-block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---- TOGGLE DESCONTO RÁPIDO na lista ----
+function toggleDescontoRapido(id) {
+  const p = PRODUTOS.find(x => x.id == id);
+  if (!p) return;
+  p.descontoAtivo = !p.descontoAtivo;
+  renderListaProdutos();
+  mostrarAviso(p.descontoAtivo ? '✅ Desconto ativado para ' + p.nome : '❌ Desconto desativado para ' + p.nome);
+}
+
+// ---- REMOVER PRODUTO ----
+function removerProduto(id) {
+  const p = PRODUTOS.find(x => x.id == id);
+  if (!p) return;
+  if (!confirm('Remover "' + p.nome + '"?')) return;
+  PRODUTOS = PRODUTOS.filter(x => x.id != id);
+  renderListaProdutos();
+}
+
+// ---- RENDER LISTA ADMIN ----
+function renderListaProdutos() {
+  const container = document.getElementById('lista-admin-produtos');
+  if (PRODUTOS.length === 0) {
+    container.innerHTML = '<p style="color:var(--cinza); text-align:center; padding:24px">Nenhum produto cadastrado.</p>';
+    return;
+  }
+  container.innerHTML = PRODUTOS.map(p => {
+    const temDesc = p.desconto > 0;
+    const precoDesc = temDesc ? (p.preco * (1 - p.desconto / 100)).toFixed(2).replace('.', ',') : null;
+    return `
+      <div class="produto-linha">
+        <img src="${p.foto}" onerror="this.src='https://via.placeholder.com/54?text=?'" alt="${p.nome}">
+        <div class="prod-info">
+          <strong>${p.nome}</strong>
+          <span>
+            R$ ${p.preco.toFixed(2).replace('.', ',')}/${p.unidade}
+            ${temDesc ? `→ R$ ${precoDesc} com ${p.desconto}%` : ''}
+          </span><br>
+          <span class="${p.descontoAtivo ? 'badge-on' : 'badge-off'}">
+            ${p.descontoAtivo ? '🟢 Desconto visível' : '⚫ Desconto oculto'}
+          </span>
+        </div>
+        <div class="prod-acoes">
+          <button class="btn-acao btn-azul" onclick="toggleDescontoRapido(${p.id})">
+            ${p.descontoAtivo ? '🔴 Ocultar desc.' : '🟢 Mostrar desc.'}
+          </button>
+          <button class="btn-acao btn-laranja" onclick="editarProduto(${p.id})">✏️ Editar</button>
+          <button class="btn-acao btn-vermelho" onclick="removerProduto(${p.id})">🗑️ Remover</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ---- ESTOQUE ----
+function renderEstoque() {
+  const container = document.getElementById('lista-estoque');
+  container.innerHTML = PRODUTOS.map(p => `
+    <div class="estoque-linha">
+      <div class="est-nome">
+        <img src="${p.foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:8px;"
+             onerror="this.style.display='none'" alt="">
+        ${p.nome}
+      </div>
+      <div class="est-campo">
+        <label>Qtde</label>
+        <input type="number" id="est-qtd-${p.id}" value="${p.estoque}" min="0" placeholder="0">
+      </div>
+      <div class="est-campo">
+        <label>Medida</label>
+        <select id="est-un-${p.id}">
+          <option value="unidade"   ${p.estoqueUnidade==='unidade'  ?'selected':''}>Unidade</option>
+          <option value="kg"        ${p.estoqueUnidade==='kg'       ?'selected':''}>Kg</option>
+          <option value="caixa"     ${p.estoqueUnidade==='caixa'    ?'selected':''}>Caixa</option>
+          <option value="grama"     ${p.estoqueUnidade==='grama'    ?'selected':''}>Grama</option>
+          <option value="maço"      ${p.estoqueUnidade==='maço'     ?'selected':''}>Maço</option>
+          <option value="caixa fechada" ${p.estoqueUnidade==='caixa fechada'?'selected':''}>Caixa Fechada</option>
+        </select>
+      </div>
+    </div>
+  `).join('');
+}
+
+function salvarEstoque() {
+  PRODUTOS.forEach(p => {
+    const qtd = document.getElementById('est-qtd-' + p.id);
+    const un  = document.getElementById('est-un-'  + p.id);
+    if (qtd) p.estoque = parseInt(qtd.value) || 0;
+    if (un)  p.estoqueUnidade = un.value;
+  });
+  mostrarAviso('✅ Estoque atualizado! Copie os dados para dados.js para salvar permanentemente.');
+}
+
+// ---- GRÁFICO MAIS VENDIDOS ----
+function renderGrafico() {
+  const sorted = [...PRODUTOS].sort((a, b) => b.vendas - a.vendas).slice(0, 8);
+  const max    = Math.max(...sorted.map(p => p.vendas), 1);
+
+  const grafico = document.getElementById('grafico-vendas');
+  grafico.innerHTML = sorted.map(p => {
+    const h = Math.max(8, Math.round((p.vendas / max) * 160));
+    return `
+      <div class="bar-item">
+        <span class="bar-val">${p.vendas}</span>
+        <div class="bar" style="height:${h}px; background: var(--verde)"></div>
+        <span class="bar-nome">${p.nome.split(' ')[0]}</span>
+      </div>
+    `;
+  }).join('');
+
+  const ranking = document.getElementById('ranking-lista');
+  ranking.innerHTML = sorted.map((p, i) => `
+    <div class="produto-linha">
+      <div style="font-family:'Syne',sans-serif; font-size:1.3rem; min-width:32px; text-align:center;">
+        ${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`}
+      </div>
+      <img src="${p.foto}" onerror="this.src='https://via.placeholder.com/54?text=?'" alt="${p.nome}">
+      <div class="prod-info">
+        <strong>${p.nome}</strong>
+        <span>${p.vendas} vendas esta semana</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- AVISO FLUTUANTE ----
+function mostrarAviso(msg) {
+  let el = document.getElementById('aviso-float');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'aviso-float';
+    el.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+      background:#2d6a4f;color:white;padding:12px 22px;border-radius:50px;
+      font-weight:600;font-size:0.9rem;box-shadow:0 4px 20px rgba(0,0,0,0.2);
+      z-index:9999;transition:opacity 0.3s;`;
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.opacity = '1';
+  setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+</script>
+</body>
+</html>
