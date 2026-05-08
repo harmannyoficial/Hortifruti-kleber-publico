@@ -529,13 +529,25 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
 <body>
 
+  
   <!-- HEADER -->
-  <header>
-    <div class="logo"><span>🍃</span> Dona Tônia</div>
+<header>
+  <div class="logo"><span>🍃</span> Dona Tônia</div>
+
+  <div style="display: flex; gap: 10px; align-items: center;">
+
+    <!-- BOTÃO ADMIN -->
+    <a href="admin.html" class="btn-carrinho" style="text-decoration: none;">
+      ⚙️ Admin
+    </a>
+
+    <!-- BOTÃO CARRINHO -->
     <button class="btn-carrinho" onclick="abrirCarrinho()">
       🛒 Carrinho <span id="carrinho-count">0</span>
     </button>
-  </header>
+
+  </div>
+</header>
 
   <!-- BANNER -->
   <div class="banner">

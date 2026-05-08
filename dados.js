@@ -128,3 +128,10 @@ const TAXA_ENTREGA = 5.00;
 
 // Nome da loja
 const NOME_LOJA = "Frutaria Dona Tônia";
+// PRODUTOS
+// Para adicionar um produto, copie um bloco { ... } e cole abaixo
+// foto: URL de imagem (pode usar link do Google, iFood, etc.)
+// unidade: "kg", "unidade", "caixa", "grama", "maço"
+// estoque: quantidade atual
+// desconto: 0 = sem desconto, 10 = 10%, etc.
+// descontoAtivo: true = aparece pro cliente, false = escondido
