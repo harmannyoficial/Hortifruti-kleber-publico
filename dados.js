@@ -3,27 +3,58 @@
 // Edite aqui para adicionar produtos, categorias e configurações
 // ============================================================
 
+// =========================================================
+// DADOS DA LOJA — Frutaria Dona Tônia
+// Edite este arquivo para adicionar produtos,
+// alterar preços, estoque, WhatsApp e categorias.
+// =========================================================
+
 // SENHA DO ADMINISTRADOR
 const ADMIN_SENHA = "donatonia123";
 
-// CATEGORIAS — adicione mais se quiser
+// =========================================================
+// CATEGORIAS
+// Adicione mais categorias se quiser
+// =========================================================
 const CATEGORIAS = [
-  { id: "frutas",   nome: "🍎 Frutas",   cor: "#e8533a" },
-  { id: "verduras", nome: "🥬 Verduras",  cor: "#3aad5e" },
-  { id: "legumes",  nome: "🥕 Legumes",   cor: "#f0a500" },
-  { id: "temperos", nome: "🌿 Temperos",  cor: "#7cb87a" },
-  { id: "organicos",nome: "🌱 Orgânicos", cor: "#5ab88e" },
+  { id: "frutas", nome: "🍎 Frutas", cor: "#e8533a" },
+  { id: "verduras", nome: "🥬 Verduras", cor: "#3aad5e" },
+  { id: "legumes", nome: "🥕 Legumes", cor: "#f0a500" },
+  { id: "temperos", nome: "🌿 Temperos", cor: "#7cb87a" },
+  { id: "organicos", nome: "🌱 Orgânicos", cor: "#5ab88e" },
 ];
 
+// =========================================================
 // PRODUTOS
-// Para adicionar um produto, copie um bloco { ... } e cole abaixo
-// foto: URL de imagem (pode usar link do Google, iFood, etc.)
-// unidade: "kg", "unidade", "caixa", "grama", "maço"
-// estoque: quantidade atual
-// desconto: 0 = sem desconto, 10 = 10%, etc.
-// descontoAtivo: true = aparece pro cliente, false = escondido
+//
+// COMO ADICIONAR UM NOVO PRODUTO:
+//
+// Copie um bloco { ... } e cole abaixo.
+//
+// CAMPOS:
+// id                = número único
+// nome              = nome do produto
+// categoria         = categoria cadastrada acima
+// preco             = preço
+// unidade           = kg, unidade, caixa, etc
+// foto              = link da imagem
+// desconto          = porcentagem
+// descontoAtivo     = mostra desconto para cliente
+// estoque           = quantidade em estoque
+// estoqueUnidade    = medida do estoque
+// vendas            = quantidade vendida
+//
+// NOVA FUNÇÃO:
+// quantidadeMinima  = quantidade inicial no carrinho
+//
+// Exemplo:
+// quantidadeMinima: 1
+//
+// Todos os novos produtos já terão quantidade automática.
+// =========================================================
 
 let PRODUTOS = [
+
   {
     id: 1,
     nome: "Banana Prata",
@@ -36,7 +67,9 @@ let PRODUTOS = [
     estoque: 50,
     estoqueUnidade: "caixa",
     vendas: 42,
+    quantidadeMinima: 1,
   },
+
   {
     id: 2,
     nome: "Maçã Gala",
@@ -49,7 +82,9 @@ let PRODUTOS = [
     estoque: 30,
     estoqueUnidade: "caixa",
     vendas: 28,
+    quantidadeMinima: 1,
   },
+
   {
     id: 3,
     nome: "Alface Crespa",
@@ -62,7 +97,9 @@ let PRODUTOS = [
     estoque: 80,
     estoqueUnidade: "unidade",
     vendas: 35,
+    quantidadeMinima: 1,
   },
+
   {
     id: 4,
     nome: "Cenoura",
@@ -75,7 +112,9 @@ let PRODUTOS = [
     estoque: 60,
     estoqueUnidade: "kg",
     vendas: 20,
+    quantidadeMinima: 1,
   },
+
   {
     id: 5,
     nome: "Morango",
@@ -88,7 +127,9 @@ let PRODUTOS = [
     estoque: 25,
     estoqueUnidade: "caixa",
     vendas: 58,
+    quantidadeMinima: 1,
   },
+
   {
     id: 6,
     nome: "Tomate Italiano",
@@ -101,9 +142,11 @@ let PRODUTOS = [
     estoque: 40,
     estoqueUnidade: "kg",
     vendas: 31,
+    quantidadeMinima: 1,
   },
-   {
-    id: 6,
+
+  {
+    id: 7,
     nome: "Laranja-pêra",
     categoria: "frutas",
     preco: 6.49,
@@ -114,19 +157,27 @@ let PRODUTOS = [
     estoque: 40,
     estoqueUnidade: "kg",
     vendas: 31,
+    quantidadeMinima: 1,
   },
-
-
 
 ];
 
-// WhatsApp da loja (só números, com DDI)
+// =========================================================
+// WHATSAPP DA LOJA
+// Apenas números
+// Exemplo:
+// 5511999999999
+// =========================================================
 const WHATSAPP_LOJA = "5511959175925";
 
-// Taxa de entrega
+// =========================================================
+// TAXA DE ENTREGA
+// =========================================================
 const TAXA_ENTREGA = 5.00;
 
-// Nome da loja
+// =========================================================
+// NOME DA LOJA
+// =========================================================
 const NOME_LOJA = "Frutaria Dona Tônia";
 // PRODUTOS
 // Para adicionar um produto, copie um bloco { ... } e cole abaixo
