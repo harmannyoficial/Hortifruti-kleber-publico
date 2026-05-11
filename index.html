@@ -1,26 +1,3 @@
-<!-- PROMPT
-quero criar um site de pedido de horti fruti crie html css java e as informaçoes seja manda pelo whatsap ,
-seja simples e funcional para eu editar sendo aprendis de programaçao pelo vs code adicionar mais divs facil .
-preciso que tenha uma area de adicionar mais produto com foto nome e preco e e que eu possa decidir com desconto em
-pocentagem
-e que eu possa colocar categoria de fruta verduras e legumes ou mais categorias e tenha uma parte com opção de entrega
-em casa com
-informação de endereco para o cliente cadastra o nome e o endereco telefone e que eu possa ter uma pagina integrada como
-adiministrador e quando eu liberar
-o preco de desconto apareca pro cliente e quando eu nao quiser nao aparece , quero tbm que no administrador tenha uma
-parte de quais produto vende mais na semana
-. na pagina do adiministrador tenha opcao de estoque das frutas e quantidade de caixa se o produto em caixa a grama ou
-unidade ou caixa fechada .quero saber se o produto mais vendido na semana fica salvo  os meses ?  e gostaria que quando 
-virasse o mes zerasse o mais vendido para pode comeca de novo . e quero uma controle financeiro simples
-  e nao precisa  e que seja adicionado em uma pasta doc ao emvez de zip
-
-
-Como usar:
-🛒 Loja (index.html) — o cliente vê produtos, filtra por categoria, monta carrinho e envia pedido pelo WhatsApp.
-🔐 Admin (admin.html) — senha padrão: donatonia123 (mude no dados.js). Tem 3 abas: Produtos, Estoque e Mais Vendidos.
-📝 dados.js — o arquivo mais importante para você editar como iniciante. Para adicionar produto, copie um bloco { }
-e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categoria, adicione na lista CATEGORIAS. -->
-
 <!DOCTYPE html> 
 <html lang="pt-BR">
 
@@ -99,6 +76,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       align-items: center;
       gap: 8px;
       transition: transform 0.15s, background 0.2s;
+      text-decoration: none;
     }
 
     .btn-carrinho:hover {
@@ -176,7 +154,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     /* GRID */
     .grid-produtos {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
       gap: 16px;
       padding: 12px 24px 100px;
     }
@@ -190,6 +168,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       display: flex;
       flex-direction: column;
       transition: transform 0.2s, box-shadow 0.2s;
+      min-height: 320px;
     }
 
     .card:hover {
@@ -201,6 +180,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       width: 100%;
       height: 140px;
       object-fit: cover;
+      flex-shrink: 0;
     }
 
     .card-body {
@@ -212,13 +192,23 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     }
 
     .card-nome {
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.95rem;
+      min-height: 38px;
+      line-height: 1.2;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .card-unidade {
       font-size: 0.78rem;
       color: var(--cinza);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
     }
 
     .preco-wrap {
@@ -226,6 +216,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       align-items: center;
       gap: 6px;
       flex-wrap: wrap;
+      min-height: 24px;
     }
 
     .preco-original {
@@ -249,6 +240,92 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       padding: 2px 7px;
     }
 
+    /* ESTOQUE */
+    .estoque-card {
+      margin-top: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cinza);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: #f7f7f7;
+      padding: 6px 10px;
+      border-radius: 12px;
+    }
+
+    .estoque-card strong {
+      color: var(--texto);
+    }
+
+    .estoque-badge {
+      font-size: 0.72rem;
+      font-weight: 800;
+      border-radius: 50px;
+      padding: 3px 10px;
+      color: white;
+      background: var(--verde);
+      flex-shrink: 0;
+    }
+
+    .estoque-badge.baixo {
+      background: var(--laranja);
+    }
+
+    .estoque-badge.zerado {
+      background: var(--vermelho);
+    }
+
+    /* TOAST AVISO */
+    #aviso-float {
+      position:fixed;
+      bottom:22px;
+      left:50%;
+      transform:translateX(-50%) translateY(18px);
+      min-width:280px;
+      max-width:calc(100vw - 32px);
+      background:rgba(255,255,255,0.92);
+      color:var(--texto);
+      border:1px solid rgba(45, 106, 79, 0.12);
+      backdrop-filter:blur(16px);
+      padding:14px 16px;
+      border-radius:18px;
+      box-shadow:0 18px 38px rgba(0,0,0,0.18);
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:700;
+      font-size:0.95rem;
+      opacity:0;
+      pointer-events:none;
+      transition:opacity 0.25s ease, transform 0.25s ease;
+      z-index:9999;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    #aviso-float.show {
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+    #aviso-float.success {
+      border-color:rgba(45,106,79,0.22);
+      background:rgba(82,183,136,0.9);
+    }
+    #aviso-float.warning {
+      border-color:rgba(244,162,97,0.22);
+      background:rgba(244,162,97,0.9);
+    }
+    #aviso-float.danger {
+      border-color:rgba(230,57,70,0.22);
+      background:rgba(230,57,70,0.9);
+    }
+    #aviso-float.orange {
+      border-color:rgba(244,162,97,0.22);
+      background:rgba(244,162,97,0.7);
+    }
+
     /* QUANTIDADE */
     .quantidade-produto {
       display: flex;
@@ -270,20 +347,25 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       cursor: pointer;
     }
 
+    .btn-qtd-prod:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .qtd-produto {
-      font-weight: 700;
+      font-weight: 800;
       min-width: 22px;
       text-align: center;
     }
 
     .btn-add {
-      margin-top: 10px;
+      margin-top: auto;
       background: var(--verde);
       color: white;
       border: none;
       border-radius: 10px;
       padding: 10px;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 0.9rem;
       cursor: pointer;
       width: 100%;
@@ -291,6 +373,11 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
     .btn-add:hover {
       background: var(--verde-claro);
+    }
+
+    .btn-add:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     /* OVERLAY */
@@ -389,6 +476,8 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       display: flex;
       align-items: center;
       gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     .btn-qtd {
@@ -398,12 +487,29 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       width: 28px;
       height: 28px;
       font-size: 1.1rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
 
+    .qtd-produto {
+      width: 72px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 8px 10px;
+      background: white;
+      color: var(--texto);
+      outline: none;
+    }
+    .qtd-produto:focus {
+      border-color: var(--verde);
+      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
+    }
+
     .qtd-num {
-      font-weight: 700;
+      font-weight: 800;
       min-width: 20px;
       text-align: center;
     }
@@ -416,7 +522,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       padding: 6px 10px;
       cursor: pointer;
       font-size: 0.75rem;
-      font-weight: 700;
+      font-weight: 800;
     }
 
     .btn-voltar {
@@ -428,7 +534,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       border-radius: 12px;
       padding: 14px;
       font-size: 0.95rem;
-      font-weight: 700;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -459,19 +565,22 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
     .campo label {
       font-size: 0.82rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--cinza);
     }
 
-    .campo input {
+    .campo input,
+    .campo select {
       border: 1.5px solid #ddd;
       border-radius: 10px;
       padding: 10px 12px;
       font-size: 0.95rem;
       outline: none;
+      font-family: inherit;
     }
 
-    .campo input:focus {
+    .campo input:focus,
+    .campo select:focus {
       border-color: var(--verde);
     }
 
@@ -487,7 +596,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       border-radius: 12px;
       border: 2px solid #ddd;
       background: white;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
     }
 
@@ -512,7 +621,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     }
 
     .resumo-linha.total {
-      font-weight: 800;
+      font-weight: 900;
       font-size: 1.05rem;
       color: var(--verde);
     }
@@ -525,7 +634,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       border-radius: 14px;
       padding: 16px;
       font-size: 1rem;
-      font-weight: 800;
+      font-weight: 900;
       width: 100%;
       cursor: pointer;
     }
@@ -600,7 +709,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
     <div style="display:flex; gap:10px; align-items:center;">
 
-      <a href="admin.html" class="btn-carrinho" style="text-decoration:none;">
+      <a href="admin.html" class="btn-carrinho">
         ⚙️ Admin
       </a>
 
@@ -654,13 +763,11 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       <!-- ENTREGA -->
       <div class="tipo-entrega">
 
-        <button class="btn-tipo ativo" id="btn-retirada"
-          onclick="tipoEntrega('retirada')">
+        <button class="btn-tipo ativo" id="btn-retirada" onclick="tipoEntrega('retirada')">
           🏪 Retirada
         </button>
 
-        <button class="btn-tipo" id="btn-entrega"
-          onclick="tipoEntrega('entrega')">
+        <button class="btn-tipo" id="btn-entrega" onclick="tipoEntrega('entrega')">
           🚚 Entrega
         </button>
 
@@ -682,6 +789,15 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
         </div>
 
         <div id="campos-entrega"></div>
+
+        <div class="campo" style="margin-top:12px;">
+          <label>Forma de pagamento</label>
+          <select id="cli-pagamento">
+            <option value="PIX">PIX</option>
+            <option value="Dinheiro">Dinheiro</option>
+            <option value="Cartão">Cartão</option>
+          </select>
+        </div>
 
       </div>
 
@@ -721,6 +837,19 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     let categoriaAtual = 'todos';
     let tipoEntregaAtual = 'retirada';
 
+    // =====================================================
+    // LOCAL STORAGE (PEDIDOS)
+    // =====================================================
+    function salvarPedidoLocal(pedido) {
+
+      let pedidos = JSON.parse(localStorage.getItem("PEDIDOS_DONATONIA")) || [];
+
+      pedidos.push(pedido);
+
+      localStorage.setItem("PEDIDOS_DONATONIA", JSON.stringify(pedidos));
+
+    }
+
     // INICIAR
     function init() {
 
@@ -745,6 +874,8 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       });
 
       renderProdutos();
+      atualizarContador();
+      renderCamposEntrega();
 
     }
 
@@ -783,65 +914,94 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
             ? prod.preco * (1 - prod.desconto / 100)
             : prod.preco;
 
+        const estoqueAtual = parseInt(prod.estoque) || 0;
+
+        let badgeClasse = '';
+        let badgeTexto = '';
+
+        if (estoqueAtual <= 0) {
+          badgeClasse = 'zerado';
+          badgeTexto = 'SEM ESTOQUE';
+        } else if (estoqueAtual <= 5) {
+          badgeClasse = 'baixo';
+          badgeTexto = 'ÚLTIMOS';
+        } else {
+          badgeClasse = '';
+          badgeTexto = 'OK';
+        }
+
         const card = document.createElement('div');
 
         card.className = 'card';
 
         card.innerHTML = `
 
-          <img src="${prod.foto}" alt="${prod.nome}">
+          <img src="${prod.foto}" alt="${prod.nome}" onerror="this.src='https://via.placeholder.com/400x250?text=Produto'">
 
           <div class="card-body">
 
             <div class="card-nome">${prod.nome}</div>
 
             <div class="card-unidade">
-              por ${prod.unidade}
+              <span>por ${prod.unidade}</span>
+              <div class="preco-wrap">
+                ${temDesc
+              ? `
+                  <span class="preco-original">
+                    R$ ${prod.preco.toFixed(2).replace('.', ',')}
+                  </span>
+
+                  <span class="badge-desc">
+                    -${prod.desconto}%
+                  </span>
+                `
+              : ''
+            }
+
+                <span class="preco-final">
+                  R$ ${precoFinal.toFixed(2).replace('.', ',')}
+                </span>
+              </div>
             </div>
 
-            <div class="preco-wrap">
-
-              ${temDesc
-                ? `
-                <span class="preco-original">
-                  R$ ${prod.preco.toFixed(2).replace('.', ',')}
-                </span>
-
-                <span class="badge-desc">
-                  -${prod.desconto}%
-                </span>
-              `
-                : ''
-              }
-
-              <span class="preco-final">
-                R$ ${precoFinal.toFixed(2).replace('.', ',')}
+            <!-- ESTOQUE -->
+            <div class="estoque-card">
+              <span>Estoque: <strong>${estoqueAtual} ${prod.estoqueUnidade || ''}</strong></span>
+              <span class="estoque-badge ${badgeClasse}">
+                ${badgeTexto}
               </span>
-
             </div>
 
             <!-- QUANTIDADE -->
             <div class="quantidade-produto">
 
               <button class="btn-qtd-prod"
-                onclick="diminuirQtd(${prod.id})">
+                onclick="diminuirQtd(${prod.id})"
+                ${estoqueAtual <= 0 ? 'disabled' : ''}>
                 -
               </button>
 
-              <span class="qtd-produto"
-                id="qtd-prod-${prod.id}">
-                1
-              </span>
+              <input class="qtd-produto"
+                id="qtd-prod-${prod.id}"
+                type="number"
+                min="${prod.quantidadeMinima || 1}"
+                max="${Math.min(estoqueAtual, 9999)}"
+                value="${prod.quantidadeMinima || 1}"
+                inputmode="numeric"
+                oninput="corrigirQtd(${prod.id})"
+                ${estoqueAtual <= 0 ? 'disabled' : ''}>
 
               <button class="btn-qtd-prod"
-                onclick="aumentarQtd(${prod.id})">
+                onclick="aumentarQtd(${prod.id})"
+                ${estoqueAtual <= 0 ? 'disabled' : ''}>
                 +
               </button>
 
             </div>
 
             <button class="btn-add"
-              onclick="adicionarAoCarrinho(${prod.id})">
+              onclick="adicionarAoCarrinho(${prod.id})"
+              ${estoqueAtual <= 0 ? 'disabled' : ''}>
               + Adicionar
             </button>
 
@@ -856,22 +1016,51 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     }
 
     // QUANTIDADE PRODUTO
-    function aumentarQtd(id) {
+    function corrigirQtd(id) {
+      const prod = PRODUTOS.find(p => p.id === id);
+      if (!prod) return;
 
       const el = document.getElementById('qtd-prod-' + id);
+      let valor = parseInt(el.value, 10);
+      const minimo = prod.quantidadeMinima || 1;
+      const maximo = Math.min(parseInt(prod.estoque, 10) || 0, 9999);
 
-      el.textContent = parseInt(el.textContent) + 1;
+      if (isNaN(valor) || valor < minimo) {
+        valor = minimo;
+      }
+      if (maximo > 0 && valor > maximo) {
+        valor = maximo;
+      }
+
+      el.value = valor;
+    }
+
+    function aumentarQtd(id) {
+
+      const prod = PRODUTOS.find(p => p.id === id);
+      if (!prod) return;
+
+      const estoqueAtual = parseInt(prod.estoque, 10) || 0;
+      const el = document.getElementById('qtd-prod-' + id);
+      let valor = parseInt(el.value, 10) || (prod.quantidadeMinima || 1);
+
+      if (valor < estoqueAtual) {
+        el.value = valor + 1;
+      }
 
     }
 
     function diminuirQtd(id) {
 
+      const prod = PRODUTOS.find(p => p.id === id);
+      if (!prod) return;
+
       const el = document.getElementById('qtd-prod-' + id);
+      let valor = parseInt(el.value, 10) || (prod.quantidadeMinima || 1);
+      const minimo = prod.quantidadeMinima || 1;
 
-      let valor = parseInt(el.textContent);
-
-      if (valor > 1) {
-        el.textContent = valor - 1;
+      if (valor > minimo) {
+        el.value = valor - 1;
       }
 
     }
@@ -880,9 +1069,21 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     function adicionarAoCarrinho(id) {
 
       const prod = PRODUTOS.find(p => p.id === id);
+      if (!prod) return;
+
+      const estoqueAtual = parseInt(prod.estoque) || 0;
+
+      if (estoqueAtual <= 0) {
+        alert('Produto sem estoque!');
+        return;
+      }
 
       const qtd =
-        parseInt(document.getElementById('qtd-prod-' + id).textContent);
+        parseInt(document.getElementById('qtd-prod-' + id).value, 10);
+      if (qtd > estoqueAtual) {
+        alert('Quantidade maior que o estoque disponível!');
+        return;
+      }
 
       const temDesc =
         prod.descontoAtivo && prod.desconto > 0;
@@ -897,6 +1098,11 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
       if (existente) {
 
+        if ((existente.qtd + qtd) > estoqueAtual) {
+          alert('Você já tem itens no carrinho e passou do estoque disponível!');
+          return;
+        }
+
         existente.qtd += qtd;
 
       } else {
@@ -910,8 +1116,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       }
 
       atualizarContador();
-
-      abrirCarrinho();
+      mostrarAviso('Adicionado ao carrinho!', 'orange');
 
     }
 
@@ -955,17 +1160,28 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
     function alterarQtd(id, delta) {
 
       const item = carrinho.find(c => c.id === id);
-
       if (!item) return;
 
-      item.qtd += delta;
+      const prod = PRODUTOS.find(p => p.id === id);
+      if (!prod) return;
 
-      if (item.qtd <= 0) {
+      const estoqueAtual = parseInt(prod.estoque) || 0;
+
+      const novoValor = item.qtd + delta;
+
+      if (novoValor <= 0) {
         removerItem(id);
+        return;
       }
 
-      atualizarContador();
+      if (novoValor > estoqueAtual) {
+        alert('Quantidade máxima atingida (limite do estoque).');
+        return;
+      }
 
+      item.qtd = novoValor;
+
+      atualizarContador();
       renderCarrinho();
 
     }
@@ -977,7 +1193,6 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
         carrinho.filter(c => c.id !== id);
 
       atualizarContador();
-
       renderCarrinho();
 
     }
@@ -993,6 +1208,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
         lista.innerHTML =
           '<div class="vazio">🛒 Seu carrinho está vazio</div>';
 
+        calcularTotal();
         return;
 
       }
@@ -1001,7 +1217,7 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
 
         <div class="item-carrinho">
 
-          <img src="${item.foto}">
+          <img src="${item.foto}" onerror="this.src='https://via.placeholder.com/100?text=?'">
 
           <div class="item-info">
 
@@ -1082,7 +1298,63 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
       document.getElementById('btn-entrega')
         .classList.toggle('ativo', tipo === 'entrega');
 
+      renderCamposEntrega();
       calcularTotal();
+
+    }
+
+    function renderCamposEntrega() {
+
+      const wrap = document.getElementById('campos-entrega');
+
+      if (tipoEntregaAtual === 'entrega') {
+
+        wrap.innerHTML = `
+          <div class="campo">
+            <label>Endereço</label>
+            <input type="text" id="cli-end">
+          </div>
+
+          <div class="campo">
+            <label>Bairro</label>
+            <input type="text" id="cli-bairro">
+          </div>
+
+          <div class="campo">
+            <label>Número</label>
+            <input type="text" id="cli-num">
+          </div>
+
+          <div class="campo">
+            <label>Complemento</label>
+            <input type="text" id="cli-comp">
+          </div>
+        `;
+
+      } else {
+
+        wrap.innerHTML = '';
+
+      }
+
+    }
+
+    // REGISTRAR VENDA E ATUALIZAR ESTOQUE
+    function registrarVendaLocal(pedido) {
+
+      // ATUALIZA VENDAS + ESTOQUE NO OBJETO PRODUTOS (LOCAL)
+      pedido.itens.forEach(item => {
+
+        const prod = PRODUTOS.find(p => p.id === item.id);
+        if (!prod) return;
+
+        prod.estoque = Math.max(0, (parseInt(prod.estoque) || 0) - item.qtd);
+        prod.vendas = (parseInt(prod.vendas) || 0) + item.qtd;
+
+      });
+
+      // SALVA PEDIDO NO LOCAL STORAGE
+      salvarPedidoLocal(pedido);
 
     }
 
@@ -1094,53 +1366,131 @@ e preencha. Para mudar o WhatsApp, altere WHATSAPP_LOJA. Para adicionar categori
         return;
       }
 
-      const nome =
-        document.getElementById('cli-nome').value;
-
-      const tel =
-        document.getElementById('cli-tel').value;
+      const nome = document.getElementById('cli-nome').value.trim();
+      const tel = document.getElementById('cli-tel').value.trim();
+      const pagamento = document.getElementById('cli-pagamento').value;
 
       if (!nome || !tel) {
         alert('Preencha nome e telefone!');
         return;
       }
 
-      const sub =
-        carrinho.reduce((a, c) =>
-          a + (c.precoFinal * c.qtd), 0);
+      let enderecoTexto = '';
 
-      const taxa =
-        tipoEntregaAtual === 'entrega'
-          ? TAXA_ENTREGA
-          : 0;
+      if (tipoEntregaAtual === 'entrega') {
+
+        const end = document.getElementById('cli-end')?.value.trim();
+        const bairro = document.getElementById('cli-bairro')?.value.trim();
+        const num = document.getElementById('cli-num')?.value.trim();
+        const comp = document.getElementById('cli-comp')?.value.trim();
+
+        if (!end || !bairro || !num) {
+          alert('Preencha endereço, bairro e número!');
+          return;
+        }
+
+        enderecoTexto =
+          `\n🚚 *Entrega*\n` +
+          `📍 Endereço: ${end}, Nº ${num}\n` +
+          `🏘️ Bairro: ${bairro}\n` +
+          (comp ? `📝 Complemento: ${comp}\n` : '');
+
+      } else {
+
+        enderecoTexto = `\n🏪 *Retirada na loja*\n`;
+
+      }
+
+      const sub = carrinho.reduce((a, c) => a + (c.precoFinal * c.qtd), 0);
+
+      const taxa = tipoEntregaAtual === 'entrega'
+        ? TAXA_ENTREGA
+        : 0;
 
       const total = sub + taxa;
 
-      const itens = carrinho.map(c =>
-
-        `• ${c.nome} x${c.qtd} — R$ ${(c.precoFinal * c.qtd)
-          .toFixed(2)
-          .replace('.', ',')}`
-
+      const itensTexto = carrinho.map(c =>
+        `• ${c.nome} x${c.qtd} — R$ ${(c.precoFinal * c.qtd).toFixed(2).replace('.', ',')}`
       ).join('\n');
 
+      const pedido = {
+        idPedido: Date.now(),
+        dataHora: new Date().toISOString(),
+        clienteNome: nome,
+        clienteTel: tel,
+        tipoEntrega: tipoEntregaAtual,
+        pagamento: pagamento,
+        subtotal: sub,
+        taxaEntrega: taxa,
+        total: total,
+        itens: carrinho.map(c => ({
+          id: c.id,
+          nome: c.nome,
+          qtd: c.qtd,
+          preco: c.precoFinal
+        }))
+      };
+
       const texto =
-
         `🍃 *Pedido — ${NOME_LOJA}*\n\n` +
-
+        `🧾 Pedido Nº: ${pedido.idPedido}\n` +
+        `📅 Data: ${new Date().toLocaleString('pt-BR')}\n\n` +
         `👤 Cliente: ${nome}\n` +
+        `📞 Telefone: ${tel}\n` +
+        `💳 Pagamento: ${pagamento}\n` +
+        enderecoTexto + `\n` +
+        `🛒 *Itens:*\n${itensTexto}\n\n` +
+        `💰 Subtotal: R$ ${sub.toFixed(2).replace('.', ',')}\n` +
+        (tipoEntregaAtual === 'entrega'
+          ? `🚚 Taxa entrega: R$ ${taxa.toFixed(2).replace('.', ',')}\n`
+          : `🏪 Retirada: grátis\n`
+        ) +
+        `✅ Total: R$ ${total.toFixed(2).replace('.', ',')}`;
 
-        `📞 Telefone: ${tel}\n\n` +
+      // REGISTRA VENDA + BAIXA ESTOQUE + SALVA PEDIDO
+      registrarVendaLocal(pedido);
 
-        `🛒 *Itens:*\n${itens}\n\n` +
+      // LIMPA CARRINHO
+      carrinho = [];
+      atualizarContador();
+      fecharCarrinho();
 
-        `💰 Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+      // ATUALIZA LISTA
+      renderProdutos();
 
+      // ENVIA WHATSAPP
       const url =
         `https://wa.me/${WHATSAPP_LOJA}?text=${encodeURIComponent(texto)}`;
 
       window.open(url, '_blank');
 
+      alert("Pedido registrado! Estoque e financeiro atualizados.");
+
+    }
+
+    function mostrarAviso(msg, tipo = 'success') {
+      let el = document.getElementById('aviso-float');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'aviso-float';
+        el.innerHTML = `<span class="icon">✓</span><span class="text"></span>`;
+        document.body.appendChild(el);
+      }
+
+      el.className = '';
+      el.classList.add(tipo);
+      const icon = el.querySelector('.icon');
+      const text = el.querySelector('.text');
+      const emoji = tipo === 'danger' ? '✖️' : tipo === 'warning' ? '⚠️' : tipo === 'orange' ? '✅' : '✅';
+      icon.textContent = emoji;
+      text.textContent = msg;
+
+      el.classList.add('show');
+
+      if (window.avisoTimeout) clearTimeout(window.avisoTimeout);
+      window.avisoTimeout = setTimeout(() => {
+        el.classList.remove('show');
+      }, 3000);
     }
 
     init();

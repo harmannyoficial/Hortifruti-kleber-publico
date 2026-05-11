@@ -1,16 +1,8 @@
-  // ============================================================
-// DADOS.JS — Arquivo central de produtos e configurações
-// Edite aqui para adicionar produtos, categorias e configurações
-// ============================================================
-
-// =========================================================
-// DADOS DA LOJA — Frutaria Dona Tônia
-// Edite este arquivo para adicionar produtos,
-// alterar preços, estoque, WhatsApp e categorias.
-// =========================================================
-
 // SENHA DO ADMINISTRADOR
 const ADMIN_SENHA = "donatonia123";
+
+// SENHA MASTER PARA AÇÕES CRÍTICAS
+const SENHA_MASTER = "master123";
 
 // =========================================================
 // CATEGORIAS
@@ -68,6 +60,7 @@ let PRODUTOS = [
     estoqueUnidade: "caixa",
     vendas: 42,
     quantidadeMinima: 1,
+    custoFornecedor: 3.50
   },
 
   {
@@ -83,6 +76,7 @@ let PRODUTOS = [
     estoqueUnidade: "caixa",
     vendas: 28,
     quantidadeMinima: 1,
+    custoFornecedor: 5.00
   },
 
   {
@@ -98,6 +92,7 @@ let PRODUTOS = [
     estoqueUnidade: "unidade",
     vendas: 35,
     quantidadeMinima: 1,
+    custoFornecedor: 1.80
   },
 
   {
@@ -113,6 +108,7 @@ let PRODUTOS = [
     estoqueUnidade: "kg",
     vendas: 20,
     quantidadeMinima: 1,
+    custoFornecedor: 2.50
   },
 
   {
@@ -128,6 +124,7 @@ let PRODUTOS = [
     estoqueUnidade: "caixa",
     vendas: 58,
     quantidadeMinima: 1,
+    custoFornecedor: 8.00
   },
 
   {
@@ -143,6 +140,7 @@ let PRODUTOS = [
     estoqueUnidade: "kg",
     vendas: 31,
     quantidadeMinima: 1,
+    custoFornecedor: 4.00
   },
 
   {
@@ -158,6 +156,7 @@ let PRODUTOS = [
     estoqueUnidade: "kg",
     vendas: 31,
     quantidadeMinima: 1,
+    custoFornecedor: 3.80
   },
 
 ];
@@ -179,6 +178,7 @@ const TAXA_ENTREGA = 5.00;
 // NOME DA LOJA
 // =========================================================
 const NOME_LOJA = "Frutaria Dona Tônia";
+
 // PRODUTOS
 // Para adicionar um produto, copie um bloco { ... } e cole abaixo
 // foto: URL de imagem (pode usar link do Google, iFood, etc.)
