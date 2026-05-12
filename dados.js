@@ -1,8 +1,17 @@
+// USUÁRIO DO ADMINISTRADOR
+const ADMIN_USUARIO = "admin";
 // SENHA DO ADMINISTRADOR
-const ADMIN_SENHA = "donatonia123";
+const ADMIN_SENHA = "admin";
 
+// USUÁRIO MASTER PARA AÇÕES CRÍTICAS
+const MASTER_USUARIO = "master";
 // SENHA MASTER PARA AÇÕES CRÍTICAS
 const SENHA_MASTER = "master123";
+
+// USUÁRIO RESET PARA REINICIAR LOJA (CRIADOR/PROGRAMADOR)
+const RESET_USUARIO = "criador";
+// SENHA RESET PARA REINICIAR LOJA
+const RESET_SENHA = "reiniciar123";
 
 // =========================================================
 // CATEGORIAS

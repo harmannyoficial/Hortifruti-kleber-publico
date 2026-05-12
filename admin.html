@@ -139,7 +139,7 @@
   }
   .btn-verde  { background:var(--verde); color:white; }
   .btn-verde:hover { background:var(--verde-claro); }
-  .btn-laranja { background:var(--laranja); color:white; }
+  .btn-laranja { background:var(--verde); color:white; }
   .btn-laranja:hover { opacity:0.88; }
   .btn-vermelho { background:var(--vermelho); color:white; }
   .btn-vermelho:hover { opacity:0.88; }
@@ -352,6 +352,61 @@
   }
   .link-loja:hover { transform:scale(1.03); }
 
+  .overlay-categoria-admin {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+  }
+
+  .overlay-categoria-admin.aberto { display:flex; }
+
+  .modal-categoria-admin {
+    width:100%;
+    max-width:460px;
+    background:white;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.22);
+  }
+
+  .modal-categoria-admin h2 {
+    font-family:'Syne',sans-serif;
+    font-size:1.2rem;
+    margin-bottom:8px;
+  }
+
+  .modal-categoria-admin p {
+    font-size:0.95rem;
+    color:var(--cinza);
+    margin-bottom:16px;
+  }
+
+  .modal-categoria-admin .form-grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+
+  .modal-categoria-admin .campo-admin input,
+  .modal-categoria-admin .campo-admin select {
+    width:100%;
+    border:1.5px solid #ddd;
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:0.95rem;
+    outline:none;
+  }
+
+  .modal-categoria-admin .campo-admin input:focus,
+  .modal-categoria-admin .campo-admin select:focus {
+    border-color:var(--verde);
+  }
+
   @media (max-width:480px) {
     .form-grid { grid-template-columns:1fr; }
     .conteudo { padding:14px; }
@@ -368,7 +423,8 @@
   <div class="login-box">
     <h1>🔐 Admin</h1>
     <p>Painel da Frutaria Dona Tônia</p>
-    <input type="password" id="senha-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')entrar()">
+    <input type="text" id="usuario-input" placeholder="Digite o usuário" onkeydown="if(event.key==='Enter')entrar()">
+    <input type="password" id="senha-input" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')entrar()" oninput="this.value=this.value.replace(/\s/g,'')">
     <button class="btn-entrar" onclick="entrar()">Entrar</button>
     <div class="erro-login" id="erro-login">Senha incorreta!</div>
   </div>
@@ -396,6 +452,10 @@
 
     <!-- ======== ABA PRODUTOS ======== -->
     <div class="secao ativa" id="sec-produtos">
+
+      <div style="display:flex; justify-content:flex-start; margin-bottom:16px;">
+        <button class="btn-acao btn-laranja" onclick="abrirModalCategoriaAdmin()">+ Categoria</button>
+      </div>
 
       <!-- Formulário novo produto -->
       <div class="card-form">
@@ -637,24 +697,38 @@
       <div class="card-form">
         <h2>🔐 Alterar Senhas</h2>
         <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
-          A senha admin é fixa em <strong>dados.js</strong>. Apenas a senha master pode ser alterada e salva no LocalStorage.
+          O usuário admin é fixo em <strong>dados.js</strong>. Nesta tela você pode alterar a senha admin e também o usuário e a senha master.
         </p>
 
         <div class="form-grid">
           <div class="campo-admin">
-            <label for="nova-admin-senha">Senha Admin (fixa em dados.js)</label>
-            <input type="password" id="nova-admin-senha" placeholder="Não editável" disabled>
+            <label for="nova-admin-senha">Senha Admin (atual: <span id="admin-senha-atual"></span>)</label>
+            <input type="password" id="nova-admin-senha" placeholder="Nova senha admin" oninput="this.value=this.value.replace(/\s/g,'')">
           </div>
 
           <div class="campo-admin">
-            <label for="nova-master-senha">Senha Master (atual: ${localStorage.getItem('SENHA_MASTER') || SENHA_MASTER})</label>
-            <input type="password" id="nova-master-senha" placeholder="Nova senha master">
+            <label for="nova-master-usuario">Usuário Master (atual: <span id="master-usuario-atual"></span>)</label>
+            <input type="text" id="nova-master-usuario" placeholder="Novo usuário master">
           </div>
+
+          <div class="campo-admin">
+            <label for="nova-master-senha">Senha Master (atual: <span id="master-senha-atual"></span>)</label>
+            <input type="password" id="nova-master-senha" placeholder="Nova senha master" oninput="this.value=this.value.replace(/\s/g,'')">
+          </div>
+
         </div>
 
-        <div style="margin-top:14px;">
-          <button class="btn-acao btn-verde" onclick="alterarSenhas()">💾 Salvar Senhas</button>
+        <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+          <button class="btn-acao btn-verde" onclick="alterarCredenciais()">💾 Salvar Configurações</button>
         </div>
+      </div>
+
+      <div class="card-form">
+        <h2>🔄 Reiniciar Loja</h2>
+        <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
+          Esta ação zera vendas, estoque e registros temporários. Requer o usuário e a senha do criador para reinício.
+        </p>
+        <button class="btn-acao btn-vermelho" onclick="resetarLoja()">🔄 Reiniciar Loja</button>
       </div>
 
       <div class="card-form">
@@ -676,7 +750,7 @@
     <p id="senha-modal-text">Digite a senha para confirmar a exclusão.</p>
 
     <input type="password" id="senha-confirmacao" placeholder="Senha"
-      onkeydown="if(event.key==='Enter')confirmarExclusao()">
+      onkeydown="if(event.key==='Enter')confirmarExclusao()" oninput="this.value=this.value.replace(/\s/g,'')">
 
     <div class="acoes">
       <button class="btn-acao btn-laranja" onclick="fecharModalSenha()">Cancelar</button>
@@ -690,11 +764,13 @@
 <!-- ======================== MODAL SENHA MASTER ======================== -->
 <div class="overlay-senha" id="overlay-master" onclick="fecharModalMasterSeFora(event)">
   <div class="modal-senha">
-    <h3>🔒 Senha Master</h3>
-    <p>Digite a senha master para confirmar esta ação crítica.</p>
+    <h3>🔒 Autenticação</h3>
+    <p>Digite o usuário e a senha para confirmar esta ação.</p>
 
-    <input type="password" id="senha-master-confirmacao" placeholder="Senha Master"
+    <input type="text" id="usuario-master-confirmacao" placeholder="Usuário"
       onkeydown="if(event.key==='Enter')confirmarAcaoMaster()">
+  <input type="password" id="senha-master-confirmacao" placeholder="Senha"
+      onkeydown="if(event.key==='Enter')confirmarAcaoMaster()" oninput="this.value=this.value.replace(/\s/g,'')">
 
     <div class="acoes">
       <button class="btn-acao btn-laranja" onclick="fecharModalMaster()">Cancelar</button>
@@ -702,6 +778,35 @@
     </div>
 
     <div class="erro-senha" id="erro-master-confirm">Senha incorreta!</div>
+  </div>
+</div>
+
+<div class="overlay-categoria-admin" id="overlay-categoria-admin" onclick="fecharModalCategoriaAdmin(event)">
+  <div class="modal-categoria-admin" onclick="event.stopPropagation()">
+    <h2>+ Nova Categoria</h2>
+    <p>Cadastre uma categoria e ela ficará disponível no cadastro de produtos.</p>
+    <div class="form-grid">
+      <div class="campo-admin">
+        <label>ID da categoria</label>
+        <input id="nova-categoria-id-admin" type="text" placeholder="ex: saudaveis" autocomplete="off">
+      </div>
+      <div class="campo-admin">
+        <label>Nome da categoria</label>
+        <input id="nova-categoria-nome-admin" type="text" placeholder="Ex: Saudáveis" autocomplete="off">
+      </div>
+      <div class="campo-admin">
+        <label>Emoji</label>
+        <input id="nova-categoria-emoji-admin" type="text" placeholder="Ex: 🥗" autocomplete="off" maxlength="2">
+      </div>
+      <div class="campo-admin">
+        <label>Cor</label>
+        <input id="nova-categoria-cor-admin" type="color" value="#5ab88e">
+      </div>
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; margin-top:16px;">
+      <button class="btn-acao btn-laranja" onclick="fecharModalCategoriaAdmin()">Cancelar</button>
+      <button class="btn-acao btn-verde" onclick="salvarCategoriaAdmin()">Salvar Categoria</button>
+    </div>
   </div>
 </div>
 
@@ -718,22 +823,38 @@ const LS_PEDIDOS  = "PEDIDOS_DONA_TONIA";
 const LS_DESPESAS = "DESPESAS_DONA_TONIA";
 const LS_DESPERDICIOS = "DESPERDICIOS_DONA_TONIA";
 const LS_ENTRADAS_ESTOQUE = "ENTRADAS_ESTOQUE_DONA_TONIA";
+const LS_PRODUTOS = "PRODUTOS_DONA_TONIA";
+const LS_CARRINHO = "CARRINHO_DONA_TONIA";
+const LS_ADMIN_USUARIO = "ADMIN_USUARIO";
+const LS_ADMIN_SENHA = "ADMIN_SENHA";
+const LS_MASTER_USUARIO = "MASTER_USUARIO";
 const LS_MASTER_SENHA = "SENHA_MASTER";
+const LS_RESET_USUARIO = "RESET_USUARIO";
+const LS_RESET_SENHA = "RESET_SENHA";
 const LS_ULTIMA_ABERTURA = "ULTIMA_ABERTURA";
+const LS_ADMIN_LOCK = "ADMIN_LOCK_DONA_TONIA";
+const LS_CATEGORIAS = "CATEGORIAS_DONA_TONIA";
+
+let categoriasAdmin = [];
 
 // Variáveis exclusão
 let excluirTipo = null; // "pedido" ou "despesa"
 let excluirId   = null;
+let adminSessionId = null;
 
 // ---- LOGIN ----
 function entrar() {
-  const s = document.getElementById('senha-input').value;
-  const senhaAdmin = ADMIN_SENHA;
-  if (s === senhaAdmin) {
+  const usuario = document.getElementById('usuario-input').value.trim();
+  const senha = document.getElementById('senha-input').value;
+  const adminUsuario = localStorage.getItem(LS_ADMIN_USUARIO) || ADMIN_USUARIO;
+  const senhaAdmin = localStorage.getItem(LS_ADMIN_SENHA) || ADMIN_SENHA;
+
+  if (usuario === adminUsuario && senha === senhaAdmin) {
     // Registrar abertura
     localStorage.setItem(LS_ULTIMA_ABERTURA, new Date().toISOString());
     document.getElementById('tela-login').style.display = 'none';
     document.getElementById('tela-admin').style.display  = 'block';
+    iniciarSessaoAdmin();
     iniciarAdmin();
   } else {
     document.getElementById('erro-login').style.display = 'block';
@@ -759,11 +880,68 @@ function mudarAba(id, el) {
 }
 
 // ---- INIT ----
+function carregarProdutosAdmin() {
+  try {
+    const produtosSalvos = JSON.parse(localStorage.getItem(LS_PRODUTOS) || 'null');
+    if (Array.isArray(produtosSalvos) && produtosSalvos.length > 0) {
+      PRODUTOS = produtosSalvos;
+    }
+  } catch (e) {
+    console.warn('Erro ao carregar produtos do LocalStorage', e);
+  }
+}
+
+function salvarProdutosAdmin() {
+  localStorage.setItem(LS_PRODUTOS, JSON.stringify(PRODUTOS));
+}
+
+function carregarCategoriasAdmin() {
+  try {
+    const guardado = JSON.parse(localStorage.getItem(LS_CATEGORIAS) || 'null');
+    categoriasAdmin = [...CATEGORIAS];
+
+    if (Array.isArray(guardado) && guardado.length > 0) {
+      guardado.forEach(cat => {
+        if (cat && cat.id && !categoriasAdmin.some(c => c.id === cat.id)) {
+          categoriasAdmin.push(cat);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Erro ao carregar categorias do LocalStorage', e);
+    categoriasAdmin = [...CATEGORIAS];
+  }
+}
+
+function salvarCategoriasAdmin() {
+  const categoriasExtras = categoriasAdmin.filter(cat =>
+    !CATEGORIAS.some(orig => orig.id === cat.id)
+  );
+  localStorage.setItem(LS_CATEGORIAS, JSON.stringify(categoriasExtras));
+}
+
+function iniciarSessaoAdmin() {
+  adminSessionId = Date.now().toString();
+  localStorage.setItem(LS_ADMIN_LOCK, adminSessionId);
+  window.addEventListener('storage', e => {
+    if (e.key === LS_ADMIN_LOCK && e.newValue && e.newValue !== adminSessionId) {
+      alert('A senha master mudou ou uma nova sessão foi iniciada. Faça login novamente.');
+      sair();
+    }
+  });
+}
+
+function forcarLogoutOutrasAbas() {
+  localStorage.setItem(LS_ADMIN_LOCK, Date.now().toString());
+}
+
 function iniciarAdmin() {
+  carregarProdutosAdmin();
+  carregarCategoriasAdmin();
   // Preencher categorias no select
   const sel = document.getElementById('p-cat');
   sel.innerHTML = '';
-  CATEGORIAS.forEach(c => {
+  categoriasAdmin.forEach(c => {
     const op = document.createElement('option');
     op.value = c.id; op.textContent = c.nome;
     sel.appendChild(op);
@@ -785,6 +963,68 @@ function iniciarAdmin() {
   });
 
   renderListaProdutos();
+}
+
+function abrirModalCategoriaAdmin() {
+  const overlay = document.getElementById('overlay-categoria-admin');
+  document.getElementById('nova-categoria-id-admin').value = '';
+  document.getElementById('nova-categoria-nome-admin').value = '';
+  document.getElementById('nova-categoria-emoji-admin').value = '';
+  document.getElementById('nova-categoria-cor-admin').value = '#5ab88e';
+  overlay.classList.add('aberto');
+}
+
+function fecharModalCategoriaAdmin(event) {
+  if (event && event.target && event.target.id !== 'overlay-categoria-admin') return;
+  document.getElementById('overlay-categoria-admin').classList.remove('aberto');
+}
+
+function salvarCategoriaAdmin() {
+  const idInput = document.getElementById('nova-categoria-id-admin');
+  const nomeInput = document.getElementById('nova-categoria-nome-admin');
+  const emojiInput = document.getElementById('nova-categoria-emoji-admin');
+  const corInput = document.getElementById('nova-categoria-cor-admin');
+
+  const id = (idInput.value || '').trim().toLowerCase().replace(/\s+/g, '-');
+  const nome = (nomeInput.value || '').trim();
+  const emoji = (emojiInput.value || '').trim();
+  const cor = corInput.value || '#5ab88e';
+
+  if (!id || !nome) {
+    alert('Preencha o ID e o nome da categoria.');
+    return;
+  }
+
+  if (!/^[a-z0-9_-]+$/.test(id)) {
+    alert('O ID deve conter apenas letras, números, hífen ou underscore, sem espaços.');
+    return;
+  }
+
+  if (categoriasAdmin.some(cat => cat.id === id)) {
+    alert('Já existe uma categoria com este ID.');
+    return;
+  }
+
+  categoriasAdmin.push({
+    id,
+    nome: emoji ? `${emoji} ${nome}` : nome,
+    cor
+  });
+
+  salvarCategoriasAdmin();
+  atualizarCategoriasAdmin();
+  fecharModalCategoriaAdmin();
+  mostrarAviso && mostrarAviso('Categoria adicionada!', 'success');
+}
+
+function atualizarCategoriasAdmin() {
+  const sel = document.getElementById('p-cat');
+  sel.innerHTML = '';
+  categoriasAdmin.forEach(c => {
+    const op = document.createElement('option');
+    op.value = c.id; op.textContent = c.nome;
+    sel.appendChild(op);
+  });
 }
 
 // ---- TOGGLE DESCONTO ----
@@ -830,7 +1070,8 @@ function salvarProduto() {
   }
 
   renderListaProdutos();
-  mostrarAviso('Produto salvo! Atualize dados.js para persistir.', 'success');
+  salvarProdutosAdmin();
+  mostrarAviso('Produto salvo e persistido localmente!', 'success');
 }
 
 function limparForm() {
@@ -889,6 +1130,7 @@ function removerProduto(id) {
   if (!confirm('Remover "' + p.nome + '"?')) return;
   PRODUTOS = PRODUTOS.filter(x => x.id != id);
   renderListaProdutos();
+  salvarProdutosAdmin();
 }
 
 // ---- RENDER LISTA ADMIN ----
@@ -975,7 +1217,8 @@ function salvarEstoque() {
     if (un)  p.estoqueUnidade = un.value;
   });
 
-  mostrarAviso('Estoque atualizado! Copie os dados para dados.js para salvar permanentemente.', 'success');
+  salvarProdutosAdmin();
+  mostrarAviso('Estoque atualizado e salvo localmente!', 'success');
 }
 
 // ---- GRÁFICO MAIS VENDIDOS ----
@@ -1113,6 +1356,10 @@ function dentroDaSemana(dataISO) {
   return diff <= 7;
 }
 
+function obterDataPedido(pedido) {
+  return pedido.data || pedido.dataHora || pedido.dataPedido || '';
+}
+
 function dentroDoMes(dataISO) {
   const d = new Date(dataISO);
   const agora = new Date();
@@ -1133,9 +1380,9 @@ function renderFinanceiro() {
   const despesasTotal = despesas.reduce((a,d) => a + (d.valor || 0), 0);
   const desperdiciosTotal = desperdicios.reduce((a,d) => a + (d.valorPerdido || 0), 0);
 
-  const receitaDia = pedidos.filter(p => dentroDoDia(p.data)).reduce((a,p) => a + (p.total || 0), 0);
-  const receitaSemana = pedidos.filter(p => dentroDaSemana(p.data)).reduce((a,p) => a + (p.total || 0), 0);
-  const receitaMes = pedidos.filter(p => dentroDoMes(p.data)).reduce((a,p) => a + (p.total || 0), 0);
+  const receitaDia = pedidos.filter(p => dentroDoDia(obterDataPedido(p))).reduce((a,p) => a + (p.total || 0), 0);
+  const receitaSemana = pedidos.filter(p => dentroDaSemana(obterDataPedido(p))).reduce((a,p) => a + (p.total || 0), 0);
+  const receitaMes = pedidos.filter(p => dentroDoMes(obterDataPedido(p))).reduce((a,p) => a + (p.total || 0), 0);
 
   const despesasMes = despesas.filter(d => dentroDoMes(d.data)).reduce((a,d) => a + (d.valor || 0), 0);
   const desperdiciosMes = desperdicios.filter(d => dentroDoMes(d.data)).reduce((a,d) => a + (d.valorPerdido || 0), 0);
@@ -1251,15 +1498,17 @@ function renderFinanceiro() {
     listaPed.innerHTML = `<p style="color:var(--cinza); text-align:center; padding:18px;">Nenhuma venda registrada ainda.</p>`;
   } else {
     listaPed.innerHTML = pedidos.map(p => {
-      const itensTxt = (p.itens || []).map(i => `• ${i.nome} x${i.qtd} — ${dinheiro(i.total)}`).join("<br>");
+      const itensTxt = (p.itens || []).map(i => `• ${i.nome} x${i.qtd} — ${dinheiro(i.total || (i.preco * i.qtd))}`).join("<br>");
+      const pedidoId = p.id || p.idPedido;
+      const dataPedido = obterDataPedido(p);
 
       return `
         <div class="linha-fin">
           <div class="linha-fin-top">
             <div>
-              <strong>Pedido #${p.id}</strong>
-              <small>${new Date(p.data).toLocaleString()} • ${p.tipoEntrega} • ${p.pagamento}</small><br>
-              <small>${p.nome ? "Cliente: " + p.nome : ""} ${p.telefone ? " • " + p.telefone : ""}</small>
+              <strong>Pedido #${pedidoId}</strong>
+              <small>${new Date(dataPedido).toLocaleString()} • ${p.tipoEntrega} • ${p.pagamento}</small><br>
+              <small>${p.clienteNome || p.nome ? "Cliente: " + (p.clienteNome || p.nome) : ""} ${p.clienteTel || p.telefone ? " • " + (p.clienteTel || p.telefone) : ""}</small>
             </div>
             <div class="valor">${dinheiro(p.total)}</div>
           </div>
@@ -1272,7 +1521,7 @@ function renderFinanceiro() {
           </div>
 
           <div class="linha-fin-botoes">
-            <button class="btn-acao btn-vermelho" onclick="pedirSenhaExcluir('pedido', ${p.id})">🗑️ Excluir</button>
+            <button class="btn-acao btn-vermelho" onclick="pedirSenhaExcluir('pedido', ${pedidoId})">🗑️ Excluir</button>
           </div>
         </div>
       `;
@@ -1339,20 +1588,7 @@ function confirmarExclusao() {
     }
     pedidos = pedidos.filter(p => p.id != excluirId);
     setPedidos(pedidos);
-    mostrarAviso('Pedido excluído e estoque devolvido!', 'danger');
-  }
-
-  if (excluirTipo === "despesa") {
-    let despesas = getDespesas();
-    despesas = despesas.filter(d => d.id != excluirId);
-    setDespesas(despesas);
-    mostrarAviso('Despesa excluída!', 'danger');
-  }
-
-  if (excluirTipo === "desperdicio") {
-    let desperdicios = getDesperdicios();
-    desperdicios = desperdicios.filter(d => d.id != excluirId);
-    setDesperdicios(desperdicios);
+      salvarProdutosAdmin();
     mostrarAviso('Desperdício excluído!', 'danger');
   }
 
@@ -1397,6 +1633,7 @@ function registrarEntradaEstoque() {
       data: new Date().toISOString()
     });
     setEntradasEstoque(entradas);
+    salvarProdutosAdmin();
 
     // Limpar campos
     document.getElementById('entrada-qtd').value = '';
@@ -1452,6 +1689,7 @@ function registrarDesperdicio() {
       data: new Date().toISOString()
     });
     setDesperdicios(desperdicios);
+    salvarProdutosAdmin();
 
     // Limpar campos
     document.getElementById('desperdicio-qtd').value = '';
@@ -1465,45 +1703,106 @@ function registrarDesperdicio() {
 }
 
 // ---- ALTERAR SENHAS ----
-function alterarSenhas() {
-  const novaMaster = document.getElementById('nova-master-senha').value.trim();
+function alterarCredenciais() {
+  const novaAdminSenha = document.getElementById('nova-admin-senha').value.trim();
+  const novoMasterUsuario = document.getElementById('nova-master-usuario').value.trim();
+  const novaMasterSenha = document.getElementById('nova-master-senha').value.trim();
 
-  if (novaMaster) {
-    localStorage.setItem(LS_MASTER_SENHA, novaMaster);
+  if (novaAdminSenha) {
+    localStorage.setItem(LS_ADMIN_SENHA, novaAdminSenha);
+    forcarLogoutOutrasAbas();
+  }
+  if (novoMasterUsuario) {
+    localStorage.setItem(LS_MASTER_USUARIO, novoMasterUsuario);
+  }
+  if (novaMasterSenha) {
+    localStorage.setItem(LS_MASTER_SENHA, novaMasterSenha);
+    forcarLogoutOutrasAbas();
   }
 
   document.getElementById('nova-admin-senha').value = '';
+  document.getElementById('nova-master-usuario').value = '';
   document.getElementById('nova-master-senha').value = '';
 
-  mostrarAviso('Senha master alterada!', 'success');
+  mostrarAviso('Configurações salvas! Se alterou senha, faça login novamente.', 'success');
   renderConfig();
 }
 
-// ---- RENDER CONFIG ----
+// função de reset escondida: use no console ou adapte no código quando quiser reiniciar a loja
+function resetarLoja() {
+  acaoMaster = () => {
+    localStorage.removeItem(LS_PEDIDOS);
+    localStorage.removeItem(LS_DESPESAS);
+    localStorage.removeItem(LS_DESPERDICIOS);
+    localStorage.removeItem(LS_ENTRADAS_ESTOQUE);
+    localStorage.removeItem(LS_CARRINHO);
+    localStorage.removeItem(LS_ULTIMA_ABERTURA);
+    localStorage.removeItem(LS_ADMIN_USUARIO);
+    localStorage.removeItem(LS_ADMIN_SENHA);
+    localStorage.removeItem(LS_MASTER_USUARIO);
+    localStorage.removeItem(LS_MASTER_SENHA);
+    localStorage.removeItem(LS_RESET_USUARIO);
+    localStorage.removeItem(LS_RESET_SENHA);
+
+    PRODUTOS.forEach(prod => {
+      prod.estoque = 0;
+      prod.vendas = 0;
+    });
+
+    salvarProdutosAdmin();
+    renderListaProdutos();
+    renderEstoque();
+    renderFinanceiro();
+    renderConfig();
+
+    mostrarAviso('Loja reiniciada! Credenciais e registros voltaram ao padrão.', 'success');
+  };
+
+  pedirSenhaMaster('reset');
+}
 function renderConfig() {
   const ultimaAbertura = document.getElementById('ultima-abertura');
   const abertura = localStorage.getItem(LS_ULTIMA_ABERTURA);
   ultimaAbertura.textContent = abertura ? new Date(abertura).toLocaleString('pt-BR') : 'Nunca aberto';
 
-  // Atualizar labels com senhas atuais
-  document.querySelector('label[for="nova-admin-senha"]').textContent = 'Senha Admin (fixa em dados.js)';
-  const masterAtual = localStorage.getItem(LS_MASTER_SENHA) || SENHA_MASTER;
-  document.querySelector('label[for="nova-master-senha"]').textContent = `Senha Master (atual: ${masterAtual})`;
+  const adminSenhaAtual = localStorage.getItem(LS_ADMIN_SENHA) || ADMIN_SENHA;
+  const masterAtual = localStorage.getItem(LS_MASTER_USUARIO) || MASTER_USUARIO;
+  const masterSenhaAtual = localStorage.getItem(LS_MASTER_SENHA) || SENHA_MASTER;
+
+  document.getElementById('admin-senha-atual').textContent = adminSenhaAtual ? '********' : 'padrão';
+  document.getElementById('master-usuario-atual').textContent = masterAtual;
+  document.getElementById('master-senha-atual').textContent = masterSenhaAtual ? '********' : 'padrão';
 }
 
 // ---- MODAL SENHA MASTER ----
 let acaoMaster = null;
+let tipoAcaoSegura = null;
 
-function pedirSenhaMaster() {
+function pedirSenhaMaster(tipo = 'master') {
+  tipoAcaoSegura = tipo;
+  document.getElementById("usuario-master-confirmacao").value = "";
   document.getElementById("senha-master-confirmacao").value = "";
   document.getElementById("erro-master-confirm").style.display = "none";
+
+  const titulo = document.getElementById("senha-modal-titulo");
+  const texto = document.getElementById("senha-modal-text");
+
+  if (tipo === 'reset') {
+    titulo.textContent = "🔒 Senha de Reinício";
+    texto.textContent = "Digite o usuário e senha do criador para confirmar a restauração da loja.";
+  } else {
+    titulo.textContent = "🔒 Senha Master";
+    texto.textContent = "Digite o usuário e a senha master para confirmar esta ação crítica.";
+  }
+
   document.getElementById("overlay-master").classList.add("aberto");
-  setTimeout(() => document.getElementById("senha-master-confirmacao").focus(), 50);
+  setTimeout(() => document.getElementById("usuario-master-confirmacao").focus(), 50);
 }
 
 function fecharModalMaster() {
   document.getElementById("overlay-master").classList.remove("aberto");
   acaoMaster = null;
+  tipoAcaoSegura = null;
 }
 
 function fecharModalMasterSeFora(e) {
@@ -1511,10 +1810,18 @@ function fecharModalMasterSeFora(e) {
 }
 
 function confirmarAcaoMaster() {
-  const senha = document.getElementById("senha-master-confirmacao").value;
+  const usuario = document.getElementById("usuario-master-confirmacao").value.trim();
+  const senha = document.getElementById("senha-master-confirmacao").value.replace(/\s/g,'');
+  const usuarioMaster = localStorage.getItem(LS_MASTER_USUARIO) || MASTER_USUARIO;
   const senhaMaster = localStorage.getItem(LS_MASTER_SENHA) || SENHA_MASTER;
+  const usuarioReset = localStorage.getItem(LS_RESET_USUARIO) || RESET_USUARIO;
+  const senhaReset = localStorage.getItem(LS_RESET_SENHA) || RESET_SENHA;
 
-  if (senha !== senhaMaster) {
+  const valido = tipoAcaoSegura === 'reset'
+    ? usuario === usuarioReset && senha === senhaReset
+    : usuario === usuarioMaster && senha === senhaMaster;
+
+  if (!valido) {
     document.getElementById("erro-master-confirm").style.display = "block";
     return;
   }
