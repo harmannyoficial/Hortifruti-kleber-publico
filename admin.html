@@ -99,7 +99,7 @@
   /* FORMULARIO */
   .card-form {
     background:white; border-radius:var(--radius);
-    padding:22px; box-shadow:var(--sombra); margin-bottom:20px;
+    padding:22px; box-shadow:var(--sombra); margin-bottom:10px;
   }
   .card-form h2 { font-family:'Syne',sans-serif; font-size:1.1rem; margin-bottom:16px; }
   .form-grid {
@@ -343,11 +343,10 @@
   .link-loja {
     display:inline-block;
     background:var(--laranja); color:white;
-    border-radius:999px;
-    padding:10px 18px;
-    text-decoration:none; font-weight:900; font-size:0.9rem;
-    margin-bottom:18px;
-    box-shadow:0 4px 18px rgba(0,0,0,0.12);
+    border-radius:8px;
+    padding:8px 14px;
+    text-decoration:none; font-weight:700; font-size:0.85rem;
+    box-shadow:0 2px 8px rgba(0,0,0,0.12);
     transition:transform 0.15s;
   }
   .link-loja:hover { transform:scale(1.03); }
@@ -407,11 +406,88 @@
     border-color:var(--verde);
   }
 
+  /* BARRA DE BUSCA ISOLADA POR ABA */
+  .busca-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+    gap: 8px;
+    max-width: 340px;
+  }
+
+  .busca-container.expandido {
+    max-width: 100%;
+  }
+
+  .busca-icon {
+    color: var(--cinza);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .busca-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: var(--texto);
+    background: transparent;
+  }
+
+  .busca-input::placeholder {
+    color: var(--cinza);
+  }
+
+  .busca-input:focus {
+    outline: none;
+  }
+
+  .busca-container:focus-within {
+    border-color: var(--verde);
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
+  }
+
+  .busca-limpar {
+    background: none;
+    border: none;
+    color: var(--cinza);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 0;
+    display: none;
+    flex-shrink: 0;
+    transition: color 0.2s;
+  }
+
+  .busca-limpar:hover {
+    color: var(--texto);
+  }
+
+  .busca-limpar.visivel {
+    display: block;
+  }
+
+  .resultado-vazio {
+    text-align: center;
+    padding: 30px;
+    color: var(--cinza);
+    background: white;
+    border-radius: var(--radius);
+    margin: 10px 0;
+  }
+
   @media (max-width:480px) {
     .form-grid { grid-template-columns:1fr; }
     .conteudo { padding:14px; }
     .produto-linha { flex-wrap:wrap; }
     .login-box { width:100%; max-width:340px; }
+    .busca-container { max-width: 100%; }
   }
 </style>
 </head>
@@ -435,7 +511,10 @@
 
   <div class="admin-header">
     <h1>🍃 Admin — Dona Tônia</h1>
-    <button class="btn-sair" onclick="sair()">Sair</button>
+    <div style="display:flex; gap:12px; align-items:center;">
+      <a class="link-loja" href="index.html" target="_blank">🛒 Voltar para a Loja ↗</a>
+      <button class="btn-sair" onclick="sair()">Sair</button>
+    </div>
   </div>
 
   <!-- ABAS -->
@@ -448,13 +527,26 @@
   </div>
 
   <div class="conteudo">
-    <a class="link-loja" href="index.html" target="_blank">🛒 Voltar para a Loja ↗</a>
 
     <!-- ======== ABA PRODUTOS ======== -->
     <div class="secao ativa" id="sec-produtos">
 
+      <!-- Barra de busca isolada -->
+      <div class="busca-container">
+        <span class="busca-icon">🔎</span>
+        <input type="text" class="busca-input" id="busca-produtos" placeholder="Buscar produto por nome, ID ou categoria..." 
+          oninput="filtrarProdutos(this.value)">
+        <button class="busca-limpar" id="limpar-busca-produtos" onclick="limparBuscaProdutos()">✕</button>
+      </div>
+
       <div style="display:flex; justify-content:flex-start; margin-bottom:16px;">
         <button class="btn-acao btn-laranja" onclick="abrirModalCategoriaAdmin()">+ Categoria</button>
+      </div>
+
+      <!-- Lista de categorias -->
+      <div class="card-form" style="margin-bottom:20px;">
+        <h2>📂 Categorias Cadastradas</h2>
+        <div id="lista-categorias"></div>
       </div>
 
       <!-- Formulário novo produto -->
@@ -521,6 +613,14 @@
 
     <!-- ======== ABA ESTOQUE ======== -->
     <div class="secao" id="sec-estoque">
+
+      <!-- Barra de busca isolada -->
+      <div class="busca-container">
+        <span class="busca-icon">🔎</span>
+        <input type="text" class="busca-input" id="busca-estoque" placeholder="Buscar produto no estoque..." 
+          oninput="filtrarEstoque(this.value)">
+        <button class="busca-limpar" id="limpar-busca-estoque" onclick="limparBuscaEstoque()">✕</button>
+      </div>
 
       <!-- Controle de Estoque -->
       <div class="card-form" style="margin-bottom:20px">
@@ -615,6 +715,15 @@
 
     <!-- ======== ABA MAIS VENDIDOS ======== -->
     <div class="secao" id="sec-vendas">
+      
+      <!-- Barra de busca isolada -->
+      <div class="busca-container">
+        <span class="busca-icon">🔎</span>
+        <input type="text" class="busca-input" id="busca-vendas" placeholder="Buscar produto por nome..." 
+          oninput="filtrarVendas(this.value)">
+        <button class="busca-limpar" id="limpar-busca-vendas" onclick="limparBuscaVendas()">✕</button>
+      </div>
+
       <div class="card-form" style="margin-bottom:20px">
         <h2>🏆 Produtos Mais Vendidos</h2>
         <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
@@ -622,11 +731,11 @@
         </p>
       </div>
 
+      <div id="ranking-lista" style="margin-bottom:20px;"></div>
+
       <div class="card-form">
         <div class="bar-chart" id="grafico-vendas"></div>
       </div>
-
-      <div id="ranking-lista" style="margin-top:16px;"></div>
     </div>
 
     <!-- ======== ABA FINANCEIRO ======== -->
@@ -635,7 +744,6 @@
       <div class="card-form">
         <h2>💰 Financeiro (Caixa)</h2>
         <p style="font-size:0.85rem; color:var(--cinza); margin-top:6px;">
-          Tudo salvo em <strong>LocalStorage</strong>. Controle simples e eficiente para comércio.
         </p>
       </div>
 
@@ -686,6 +794,15 @@
       <!-- LISTA PEDIDOS -->
       <div class="card-form">
         <h2>🧾 Pedidos / Vendas Registradas</h2>
+        
+        <!-- Barra de busca isolada para pedidos -->
+        <div class="busca-container" style="margin-bottom:16px;">
+          <span class="busca-icon">🔎</span>
+          <input type="text" class="busca-input" id="busca-financeiro" placeholder="Buscar pedido por cliente, data ou valor..." 
+            oninput="filtrarFinanceiro(this.value)">
+          <button class="busca-limpar" id="limpar-busca-financeiro" onclick="limparBuscaFinanceiro()">✕</button>
+        </div>
+        
         <div id="lista-pedidos"></div>
       </div>
 
@@ -697,7 +814,7 @@
       <div class="card-form">
         <h2>🔐 Alterar Senhas</h2>
         <p style="font-size:0.85rem; color:var(--cinza); margin-top:4px;">
-          O usuário admin é fixo em <strong>dados.js</strong>. Nesta tela você pode alterar a senha admin e também o usuário e a senha master.
+         
         </p>
 
         <div class="form-grid">
@@ -868,6 +985,12 @@ function sair() {
 
 // ---- ABAS ----
 function mudarAba(id, el) {
+  // Limpar todas as buscas ao trocar de aba
+  limparBuscaProdutos();
+  limparBuscaEstoque();
+  limparBuscaVendas();
+  limparBuscaFinanceiro();
+
   document.querySelectorAll('.secao').forEach(s => s.classList.remove('ativa'));
   document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
   document.getElementById('sec-' + id).classList.add('ativa');
@@ -963,14 +1086,27 @@ function iniciarAdmin() {
   });
 
   renderListaProdutos();
+  renderListaCategorias();
 }
 
 function abrirModalCategoriaAdmin() {
   const overlay = document.getElementById('overlay-categoria-admin');
+  const modal = overlay.querySelector('.modal-categoria-admin');
+  const titulo = modal.querySelector('h2');
+  const desc = modal.querySelector('p');
+  const btnSalvar = modal.querySelector('.btn-acao.btn-verde');
+
   document.getElementById('nova-categoria-id-admin').value = '';
+  document.getElementById('nova-categoria-id-admin').disabled = false;
   document.getElementById('nova-categoria-nome-admin').value = '';
   document.getElementById('nova-categoria-emoji-admin').value = '';
   document.getElementById('nova-categoria-cor-admin').value = '#5ab88e';
+
+  titulo.textContent = '+ Nova Categoria';
+  desc.textContent = 'Cadastre uma categoria e ela ficará disponível no cadastro de produtos.';
+
+  btnSalvar.onclick = salvarCategoriaAdmin;
+
   overlay.classList.add('aberto');
 }
 
@@ -1025,6 +1161,120 @@ function atualizarCategoriasAdmin() {
     op.value = c.id; op.textContent = c.nome;
     sel.appendChild(op);
   });
+  renderListaCategorias();
+}
+
+function renderListaCategorias() {
+  const container = document.getElementById('lista-categorias');
+  
+  const categoriasPersonalizadas = categoriasAdmin.filter(cat =>
+    !CATEGORIAS.some(orig => orig.id === cat.id)
+  );
+
+  if (categoriasPersonalizadas.length === 0) {
+    container.innerHTML = '<p style="color:var(--cinza); text-align:center; padding:16px">Nenhuma categoria personalizada cadastrada. Use apenas as padrões.</p>';
+    return;
+  }
+
+  container.innerHTML = categoriasPersonalizadas.map(cat => {
+    return `
+      <div class="produto-linha" style="margin-bottom:10px;">
+        <div style="width:36px; height:36px; border-radius:8px; background:${cat.cor}; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0;">
+          ${cat.nome.substring(0, 1)}
+        </div>
+        <div class="prod-info">
+          <strong>${cat.nome}</strong>
+          <span>ID: ${cat.id}</span>
+        </div>
+        <div class="prod-acoes">
+          <button class="btn-acao btn-laranja" onclick="editarCategoria('${cat.id}')">✏️ Editar</button>
+          <button class="btn-acao btn-vermelho" onclick="excluirCategoria('${cat.id}')">🗑️ Excluir</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function editarCategoria(id) {
+  const cat = categoriasAdmin.find(c => c.id === id);
+  if (!cat) return;
+
+  let nomeExibicao = cat.nome;
+  let emojiExibicao = '';
+  
+  // Extrair emoji e nome
+  const match = cat.nome.match(/^(.)\s(.*)$/);
+  if (match) {
+    emojiExibicao = match[1];
+    nomeExibicao = match[2];
+  }
+
+  document.getElementById('nova-categoria-id-admin').value = cat.id;
+  document.getElementById('nova-categoria-id-admin').disabled = true;
+  document.getElementById('nova-categoria-nome-admin').value = nomeExibicao;
+  document.getElementById('nova-categoria-emoji-admin').value = emojiExibicao;
+  document.getElementById('nova-categoria-cor-admin').value = cat.cor || '#5ab88e';
+
+  const overlay = document.getElementById('overlay-categoria-admin');
+  const modal = overlay.querySelector('.modal-categoria-admin');
+  const titulo = modal.querySelector('h2');
+  const desc = modal.querySelector('p');
+  
+  titulo.textContent = '✏️ Editar Categoria';
+  desc.textContent = 'Atualize os dados da categoria.';
+
+  const btnSalvar = modal.querySelector('.btn-acao.btn-verde');
+  btnSalvar.onclick = () => salvarCategoriaEditada(id);
+
+  overlay.classList.add('aberto');
+}
+
+function salvarCategoriaEditada(id) {
+  const nomeInput = document.getElementById('nova-categoria-nome-admin');
+  const emojiInput = document.getElementById('nova-categoria-emoji-admin');
+  const corInput = document.getElementById('nova-categoria-cor-admin');
+
+  const nome = (nomeInput.value || '').trim();
+  let emoji = (emojiInput.value || '').trim();
+  const cor = corInput.value || '#5ab88e';
+
+  if (!nome) {
+    alert('Preencha o nome da categoria.');
+    return;
+  }
+
+  const catIdx = categoriasAdmin.findIndex(c => c.id === id);
+  if (catIdx === -1) return;
+
+  categoriasAdmin[catIdx] = {
+    ...categoriasAdmin[catIdx],
+    nome: emoji ? `${emoji} ${nome}` : nome,
+    cor
+  };
+
+  salvarCategoriasAdmin();
+  atualizarCategoriasAdmin();
+  fecharModalCategoriaAdmin();
+  mostrarAviso('Categoria atualizada!', 'success');
+}
+
+function excluirCategoria(id) {
+  const cat = categoriasAdmin.find(c => c.id === id);
+  if (!cat) return;
+
+  const produtosComCat = PRODUTOS.filter(p => p.categoria === id);
+
+  if (produtosComCat.length > 0) {
+    alert(`Não é possível excluir a categoria "${cat.nome}" porque há ${produtosComCat.length} produto(s) usando esta categoria.\\n\\nRemova ou altere a categoria dos produtos primeiro.`);
+    return;
+  }
+
+  if (confirm(`Tem certeza que deseja excluir a categoria "${cat.nome}"?`)) {
+    categoriasAdmin = categoriasAdmin.filter(c => c.id !== id);
+    salvarCategoriasAdmin();
+    atualizarCategoriasAdmin();
+    mostrarAviso('Categoria excluída!', 'success');
+  }
 }
 
 // ---- TOGGLE DESCONTO ----
@@ -1372,6 +1622,10 @@ function dinheiro(v) {
 
 // ---- RENDER FINANCEIRO ----
 function renderFinanceiro() {
+  // Limpar resultados de busca anterior
+  const existente = document.getElementById('resultado-busca-financeiro');
+  if (existente) existente.remove();
+  
   const pedidos = getPedidos();
   const despesas = getDespesas();
   const desperdicios = getDesperdicios();
@@ -1854,6 +2108,304 @@ function mostrarAviso(msg, tipo = 'success') {
   window.avisoTimeout = setTimeout(() => {
     el.classList.remove('show');
   }, 3000);
+}
+
+// ============================================================
+// SISTEMA DE BUSCA ISOLADA POR ABA
+// ============================================================
+
+// VARIÁVEL DE CONTROLE PARA CADA ABA
+let produtosFiltrados = [];
+let estoqueFiltrado = [];
+let vendaFiltradas = [];
+let financeiroBuscaAtiva = false;
+
+// ---- ABA PRODUTOS ----
+function filtrarProdutos(termo) {
+  const inputBusca = document.getElementById('busca-produtos');
+  const btnLimpar = document.getElementById('limpar-busca-produtos');
+  
+  if (termo.trim() === '') {
+    produtosFiltrados = [];
+    renderListaProdutos();
+    btnLimpar.classList.remove('visivel');
+    return;
+  }
+
+  btnLimpar.classList.add('visivel');
+  
+  const termoLower = termo.toLowerCase();
+  produtosFiltrados = PRODUTOS.filter(p => {
+    const nome = (p.nome || '').toLowerCase();
+    const categoria = (p.categoria || '').toLowerCase();
+    const id = (p.id || '').toString();
+    
+    return nome.includes(termoLower) || 
+           categoria.includes(termoLower) || 
+           id.includes(termoLower);
+  });
+
+  renderListaProdutosFiltrados(produtosFiltrados);
+}
+
+function limparBuscaProdutos() {
+  document.getElementById('busca-produtos').value = '';
+  document.getElementById('limpar-busca-produtos').classList.remove('visivel');
+  produtosFiltrados = [];
+  renderListaProdutos();
+}
+
+function renderListaProdutosFiltrados(lista) {
+  const container = document.getElementById('lista-admin-produtos');
+
+  if (lista.length === 0) {
+    container.innerHTML = '<div class="resultado-vazio">🔎 Nenhum produto encontrado com esses critérios.</div>';
+    return;
+  }
+
+  container.innerHTML = lista.map(p => {
+    const temDesc = p.desconto > 0;
+    const precoDesc = temDesc ? (p.preco * (1 - p.desconto / 100)).toFixed(2).replace('.', ',') : null;
+
+    return `
+      <div class="produto-linha">
+        <img src="${p.foto}" onerror="this.src='https://via.placeholder.com/54?text=?'" alt="${p.nome}">
+        <div class="prod-info">
+          <strong>${p.nome}</strong>
+          <span>
+            R$ ${p.preco.toFixed(2).replace('.', ',')}/${p.unidade}
+            ${temDesc ? `→ R$ ${precoDesc} com ${p.desconto}%` : ''}
+          </span><br>
+          <span class="${p.descontoAtivo ? 'badge-on' : 'badge-off'}">
+            ${p.descontoAtivo ? '🟢 Desconto visível' : '⚫ Desconto oculto'}
+          </span>
+        </div>
+        <div class="prod-acoes">
+          <button class="btn-acao btn-azul" onclick="toggleDescontoRapido(${p.id})">
+            ${p.descontoAtivo ? '🔴 Ocultar desc.' : '🟢 Mostrar desc.'}
+          </button>
+          <button class="btn-acao btn-laranja" onclick="editarProduto(${p.id})">✏️ Editar</button>
+          <button class="btn-acao btn-vermelho" onclick="removerProduto(${p.id})">🗑️ Remover</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ---- ABA ESTOQUE ----
+function filtrarEstoque(termo) {
+  const inputBusca = document.getElementById('busca-estoque');
+  const btnLimpar = document.getElementById('limpar-busca-estoque');
+  
+  if (termo.trim() === '') {
+    estoqueFiltrado = [];
+    renderEstoque();
+    btnLimpar.classList.remove('visivel');
+    return;
+  }
+
+  btnLimpar.classList.add('visivel');
+  
+  const termoLower = termo.toLowerCase();
+  estoqueFiltrado = PRODUTOS.filter(p => {
+    const nome = (p.nome || '').toLowerCase();
+    const id = (p.id || '').toString();
+    
+    return nome.includes(termoLower) || id.includes(termoLower);
+  });
+
+  renderEstoqueFiltrado(estoqueFiltrado);
+}
+
+function limparBuscaEstoque() {
+  document.getElementById('busca-estoque').value = '';
+  document.getElementById('limpar-busca-estoque').classList.remove('visivel');
+  estoqueFiltrado = [];
+  renderEstoque();
+}
+
+function renderEstoqueFiltrado(lista) {
+  const container = document.getElementById('lista-estoque');
+
+  if (lista.length === 0) {
+    container.innerHTML = '<div class="resultado-vazio">🔎 Nenhum item de estoque encontrado com esses critérios.</div>';
+    return;
+  }
+
+  container.innerHTML = lista.map(p => `
+    <div class="estoque-linha">
+      <div class="est-nome">
+        <img src="${p.foto}" style="width:36px;height:36px;border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:8px;"
+             onerror="this.style.display='none'" alt="">
+        ${p.nome}
+      </div>
+
+      <div class="est-campo">
+        <label>Estoque</label>
+        <input type="number" id="est-qtd-${p.id}" value="${p.estoque}" min="0" placeholder="0">
+      </div>
+
+      <div class="est-campo">
+        <label>Medida</label>
+        <select id="est-un-${p.id}">
+          <option value="unidade"   ${p.estoqueUnidade==='unidade'  ?'selected':''}>Unidade</option>
+          <option value="kg"        ${p.estoqueUnidade==='kg'       ?'selected':''}>Kg</option>
+          <option value="caixa"     ${p.estoqueUnidade==='caixa'    ?'selected':''}>Caixa</option>
+          <option value="grama"     ${p.estoqueUnidade==='grama'    ?'selected':''}>Grama</option>
+          <option value="maço"      ${p.estoqueUnidade==='maço'     ?'selected':''}>Maço</option>
+          <option value="caixa fechada" ${p.estoqueUnidade==='caixa fechada'?'selected':''}>Caixa Fechada</option>
+        </select>
+      </div>
+
+      <div class="est-campo">
+        <label>Vendas</label>
+        <input type="number" value="${p.vendas}" disabled>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- ABA MAIS VENDIDOS ----
+function filtrarVendas(termo) {
+  const inputBusca = document.getElementById('busca-vendas');
+  const btnLimpar = document.getElementById('limpar-busca-vendas');
+  
+  if (termo.trim() === '') {
+    vendaFiltradas = [];
+    renderGrafico();
+    btnLimpar.classList.remove('visivel');
+    return;
+  }
+
+  btnLimpar.classList.add('visivel');
+  
+  const termoLower = termo.toLowerCase();
+  vendaFiltradas = PRODUTOS.filter(p => {
+    const nome = (p.nome || '').toLowerCase();
+    return nome.includes(termoLower);
+  }).sort((a, b) => (b.vendas || 0) - (a.vendas || 0));
+
+  renderVendasFiltradas(vendaFiltradas);
+}
+
+function limparBuscaVendas() {
+  document.getElementById('busca-vendas').value = '';
+  document.getElementById('limpar-busca-vendas').classList.remove('visivel');
+  vendaFiltradas = [];
+  renderGrafico();
+}
+
+function renderVendasFiltradas(lista) {
+  if (lista.length === 0) {
+    document.getElementById('ranking-lista').innerHTML = '<div class="resultado-vazio">🔎 Nenhum produto encontrado com esses critérios.</div>';
+    document.getElementById('grafico-vendas').innerHTML = '';
+    return;
+  }
+
+  // Renderizar gráfico filtrado
+  const top5 = lista.slice(0, 5);
+  document.getElementById('grafico-vendas').innerHTML = top5.map(p => {
+    const maiorVenda = Math.max(1, ...lista.map(x => x.vendas || 0));
+    const altura = ((p.vendas || 0) / maiorVenda) * 100;
+    return `
+      <div class="bar-item">
+        <div class="bar" style="height: ${Math.max(10, altura)}%"></div>
+        <div class="bar-nome">${p.nome.substring(0, 12)}</div>
+        <div class="bar-val">${p.vendas || 0}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Renderizar lista completa filtrada
+  document.getElementById('ranking-lista').innerHTML = lista.map((p, idx) => `
+    <div class="produto-linha" style="opacity: ${1 - (idx * 0.05)}">
+      <img src="${p.foto}" onerror="this.src='https://via.placeholder.com/54?text=?'" alt="${p.nome}">
+      <div class="prod-info">
+        <strong>#${idx + 1} - ${p.nome}</strong>
+        <span>${p.vendas || 0} unidades vendidas</span>
+      </div>
+      <div style="font-weight:800; color:var(--verde); font-size:1.05rem;">
+        ${p.vendas || 0}x
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---- ABA FINANCEIRO ----
+function filtrarFinanceiro(termo) {
+  const inputBusca = document.getElementById('busca-financeiro');
+  const btnLimpar = document.getElementById('limpar-busca-financeiro');
+  
+  if (termo.trim() === '') {
+    financeiroBuscaAtiva = false;
+    renderFinanceiro();
+    btnLimpar.classList.remove('visivel');
+    return;
+  }
+
+  btnLimpar.classList.add('visivel');
+  financeiroBuscaAtiva = true;
+  
+  const termoLower = termo.toLowerCase();
+  
+  // Filtrar apenas pedidos/vendas
+  const pedidos = getPedidos();
+  const pedidosFiltrados = pedidos.filter(p => {
+    const nome = (p.clienteNome || '').toLowerCase();
+    const tel = (p.clienteTel || '').toString();
+    const data = (p.dataHora || '').toLowerCase();
+    const valor = (p.total || 0).toString();
+    
+    return nome.includes(termoLower) || 
+           tel.includes(termoLower) || 
+           data.includes(termoLower) ||
+           valor.includes(termoLower);
+  });
+
+  renderFinanceiroFiltrado(pedidosFiltrados, [], []);
+}
+
+function limparBuscaFinanceiro() {
+  document.getElementById('busca-financeiro').value = '';
+  document.getElementById('limpar-busca-financeiro').classList.remove('visivel');
+  financeiroBuscaAtiva = false;
+  renderFinanceiro();
+}
+
+function renderFinanceiroFiltrado(pedidos, despesas, desperdicios) {
+  let conteudo = '';
+  
+  if (pedidos.length === 0) {
+    conteudo = '<div class="resultado-vazio">🔎 Nenhum pedido encontrado com esses critérios.</div>';
+  } else {
+    conteudo += `<div class="card-form"><h2>🧾 Pedidos Encontrados (${pedidos.length})</h2>`;
+    conteudo += pedidos.map(p => {
+      const data = new Date(p.dataHora || '').toLocaleString('pt-BR');
+      return `
+        <div class="linha-fin">
+          <div class="linha-fin-top">
+            <div>
+              <strong>${p.clienteNome}</strong>
+              <small>📞 ${p.clienteTel}</small>
+            </div>
+            <div class="valor">R$ ${(p.total || 0).toFixed(2).replace('.', ',')}</div>
+          </div>
+          <small style="display:block; margin-top:4px; color:var(--cinza);">📅 ${data}</small>
+        </div>
+      `;
+    }).join('') + '</div>';
+  }
+
+  // Renderizar em um container temporário dentro da seção de pedidos
+  const existente = document.getElementById('resultado-busca-financeiro');
+  if (existente) existente.remove();
+  
+  const container = document.createElement('div');
+  container.id = 'resultado-busca-financeiro';
+  container.innerHTML = conteudo;
+  
+  const listaPedidos = document.getElementById('lista-pedidos');
+  listaPedidos.parentElement.insertBefore(container, listaPedidos.nextElementSibling);
 }
 </script>
 

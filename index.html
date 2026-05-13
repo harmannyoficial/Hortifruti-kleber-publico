@@ -937,8 +937,20 @@
     const LS_PEDIDOS = "PEDIDOS_DONA_TONIA";
     const LS_CARRINHO = "CARRINHO_DONA_TONIA";
     const LS_CATEGORIAS = "CATEGORIAS_DONA_TONIA";
+    const LS_NUMERO_PEDIDO = "NUMERO_PEDIDO_DONA_TONIA";
+    const LS_NUMERO_PEDIDO_SESSION = "NUMERO_PEDIDO_SESSION_DONA_TONIA";
 
     let categoriasAtuais = [];
+
+    // =====================================================
+    // NÚMERO DO PEDIDO (REINICIA A CADA ABERTURA DO APP)
+    // =====================================================
+    function obterNumeroPedidoProximo() {
+      let numero = parseInt(localStorage.getItem(LS_NUMERO_PEDIDO_SESSION) || "0", 10);
+      numero++;
+      localStorage.setItem(LS_NUMERO_PEDIDO_SESSION, numero.toString());
+      return numero;
+    }
 
     // =====================================================
     // LOCAL STORAGE (PRODUTOS / PEDIDOS / CARRINHO / CATEGORIAS)
@@ -997,6 +1009,9 @@
 
     // INICIAR
     function init() {
+
+      // RESETAR NÚMERO DE PEDIDO DA SESSÃO (reinicia a 1 a cada abertura do app)
+      localStorage.removeItem(LS_NUMERO_PEDIDO_SESSION);
 
       carregarProdutosLocal();
       carregarCarrinhoLocal();
@@ -1067,12 +1082,6 @@
         btn.onclick = () => filtrar(cat.id, btn);
         wrap.appendChild(btn);
       });
-
-      const addBtn = document.createElement('button');
-      addBtn.className = 'btn-add-category';
-      addBtn.textContent = '+ Categoria';
-      addBtn.onclick = abrirModalNovaCategoria;
-      wrap.appendChild(addBtn);
     }
 
     function abrirModalNovaCategoria() {
@@ -1703,7 +1712,7 @@
       ).join('\n');
 
       const pedido = {
-        idPedido: Date.now(),
+        idPedido: obterNumeroPedidoProximo(),
         dataHora: new Date().toISOString(),
         clienteNome: nome,
         clienteTel: tel,
