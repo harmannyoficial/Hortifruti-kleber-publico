@@ -11,18 +11,18 @@ const SENHA_MASTER = "master123";
 // USUÁRIO RESET PARA REINICIAR LOJA (CRIADOR/PROGRAMADOR)
 const RESET_USUARIO = "criador";
 // SENHA RESET PARA REINICIAR LOJA
-const RESET_SENHA = "reiniciar123";
+const RESET_SENHA = "reiniciar987";
 
 // =========================================================
 // CATEGORIAS
 // Adicione mais categorias se quiser
 // =========================================================
 const CATEGORIAS = [
-  { id: "frutas", nome: "🍎 Frutas", cor: "#e8533a" },
-  { id: "verduras", nome: "🥬 Verduras", cor: "#3aad5e" },
-  { id: "legumes", nome: "🥕 Legumes", cor: "#f0a500" },
-  { id: "temperos", nome: "🌿 Temperos", cor: "#7cb87a" },
-  { id: "organicos", nome: "🌱 Orgânicos", cor: "#5ab88e" },
+  { id: "frutas", nome: "  Frutas", cor: "#e8533a" },
+  { id: "verduras", nome: " Verduras", cor: "#3aad5e" },
+  { id: "legumes", nome: " Legumes", cor: "#f0a500" },
+  { id: "temperos", nome: " Temperos", cor: "#7cb87a" },
+  { id: "organicos", nome: " Orgânicos", cor: "#5ab88e" },
 ];
 
 // =========================================================
