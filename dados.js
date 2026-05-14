@@ -1,57 +1,74 @@
-// USUÁRIO DO ADMINISTRADOR
-const ADMIN_USUARIO = "admin";
-// SENHA DO ADMINISTRADOR
-const ADMIN_SENHA = "admin";
+// =========================================================
+// SISTEMA DE CLIENTES LIBERADOS (CONTROLE DE ACESSO)
+// =========================================================
+//
+// status: "ativo" ou "bloqueado"
+// validade: "AAAA-MM-DD"
+//
+// senhaAdmin = senha para entrar no painel admin
+// senhaMaster = senha para ações críticas (entrada estoque, desperdício)
+// =========================================================
 
-// USUÁRIO MASTER PARA AÇÕES CRÍTICAS
-const MASTER_USUARIO = "master";
-// SENHA MASTER PARA AÇÕES CRÍTICAS
-const SENHA_MASTER = "master123";
+const CLIENTES_LIBERADOS = [
+  {
+    login: "admin",
+    senhaAdmin: "admin123",
+    senhaMaster: "master123",
+    empresa: "Frutaria Dona Tônia",
+    validade: "2026-12-31",
+    status: "ativo"
+  },
+  {
+    login: "kleber",
+    senhaAdmin: "kleber",
+    senhaMaster: "master123",
+    empresa: "Frutaria Dona Tônia",
+    validade: "2026-12-31",
+    status: "ativo"
+  },
 
-// USUÁRIO RESET PARA REINICIAR LOJA (CRIADOR/PROGRAMADOR)
+  // EXEMPLO DE CLIENTE:
+  // {
+  //   login: "lucas",
+  //   senhaAdmin: "lucas123",
+  //   senhaMaster: "lucasmaster123",
+  //   empresa: "Frutaria Lucas",
+  //   validade: "2026-12-31",
+  //   status: "ativo"
+  // }
+];
+
+// =========================================================
+// VARIÁVEIS GLOBAIS DE AUTENTICAÇÃO
+// (extraídas do primeiro cliente ativo para compatibilidade)
+// =========================================================
+const _clientePadrao = CLIENTES_LIBERADOS.find(c => c.status === "ativo") || CLIENTES_LIBERADOS[0];
+const ADMIN_USUARIO = _clientePadrao ? _clientePadrao.login : "admin";
+const ADMIN_SENHA = _clientePadrao ? _clientePadrao.senhaAdmin : "admin123";
+const MASTER_USUARIO = _clientePadrao ? _clientePadrao.login : "admin";
+const SENHA_MASTER = _clientePadrao ? _clientePadrao.senhaMaster : "master123";
+
+// =========================================================
+// RESET TRAVADO (SÓ VOCÊ TEM)
+// =========================================================
+
 const RESET_USUARIO = "criador";
-// SENHA RESET PARA REINICIAR LOJA
 const RESET_SENHA = "reiniciar987";
 
 // =========================================================
 // CATEGORIAS
-// Adicione mais categorias se quiser
 // =========================================================
+
 const CATEGORIAS = [
-  { id: "frutas", nome: "  Frutas", cor: "#e8533a" },
-  { id: "verduras", nome: " Verduras", cor: "#3aad5e" },
-  { id: "legumes", nome: " Legumes", cor: "#f0a500" },
-  { id: "temperos", nome: " Temperos", cor: "#7cb87a" },
-  { id: "organicos", nome: " Orgânicos", cor: "#5ab88e" },
+  { id: "frutas", nome: "🍎 Frutas", cor: "#e8533a" },
+  { id: "verduras", nome: "🥬 Verduras", cor: "#3aad5e" },
+  { id: "legumes", nome: "🥕 Legumes", cor: "#f0a500" },
+  { id: "temperos", nome: "🌿 Temperos", cor: "#7cb87a" },
+  { id: "organicos", nome: "🌱 Orgânicos", cor: "#5ab88e" },
 ];
 
 // =========================================================
 // PRODUTOS
-//
-// COMO ADICIONAR UM NOVO PRODUTO:
-//
-// Copie um bloco { ... } e cole abaixo.
-//
-// CAMPOS:
-// id                = número único
-// nome              = nome do produto
-// categoria         = categoria cadastrada acima
-// preco             = preço
-// unidade           = kg, unidade, caixa, etc
-// foto              = link da imagem
-// desconto          = porcentagem
-// descontoAtivo     = mostra desconto para cliente
-// estoque           = quantidade em estoque
-// estoqueUnidade    = medida do estoque
-// vendas            = quantidade vendida
-//
-// NOVA FUNÇÃO:
-// quantidadeMinima  = quantidade inicial no carrinho
-//
-// Exemplo:
-// quantidadeMinima: 1
-//
-// Todos os novos produtos já terão quantidade automática.
 // =========================================================
 
 let PRODUTOS = [
@@ -172,9 +189,6 @@ let PRODUTOS = [
 
 // =========================================================
 // WHATSAPP DA LOJA
-// Apenas números
-// Exemplo:
-// 5511999999999
 // =========================================================
 const WHATSAPP_LOJA = "5511959175925";
 
